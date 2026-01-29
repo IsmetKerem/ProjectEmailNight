@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EmailThema - Mail Detayı</title>
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPk5dHu5K9dKl8Rl6cCfQ76cEmkC0QdOHQ88vJd2H/05+Yl4dX+IT3Ug=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <link rel="stylesheet" href="wwwroot/css/style.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="layout__sidebar sidebar">
+        <div class="sidebar__brand">
+          <div class="sidebar__brand-main">
+            <div class="sidebar__logo">
+              <i class="fa-solid fa-paper-plane"></i>
+            </div>
+            <div>
+              <div class="sidebar__title">EmailThema</div>
+              <div class="sidebar__tagline">Control your inbox</div>
+            </div>
+          </div>
+          <button class="sidebar__toggle" type="button" data-sidebar-toggle>
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+
+        <nav aria-label="Ana menü">
+          <p class="sidebar__section-title">Genel</p>
+          <ul class="sidebar__nav">
+            <li class="sidebar__item">
+              <a class="sidebar__link" href="dashboard.html">
+                <span class="sidebar__link-icon">
+                  <i class="fa-solid fa-chart-line"></i>
+                </span>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <a class="sidebar__link sidebar__link--active" href="inbox.html">
+                <span class="sidebar__link-icon">
+                  <i class="fa-solid fa-inbox"></i>
+                </span>
+                <span>Gelen kutusu</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <div class="layout__main">
+        <header class="topbar">
+          <div class="topbar__left">
+            <button
+              class="topbar__icon-btn"
+              type="button"
+              onclick="window.location.href='inbox.html'"
+            >
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <h1 class="topbar__title">Mail detayı</h1>
+          </div>
+          <div class="topbar__right">
+            <button class="topbar__icon-btn" type="button">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
+            <button class="topbar__icon-btn" type="button">
+              <i class="fa-solid fa-box-archive"></i>
+            </button>
+            <button class="topbar__profile" type="button">
+              <span class="topbar__avatar">İK</span>
+              <span class="topbar__user">
+                <span class="topbar__user-name">İsmet Kerem</span>
+                <span class="topbar__user-role">Workspace Owner</span>
+              </span>
+              <i class="fa-solid fa-chevron-down" style="font-size: 0.65rem"></i>
+            </button>
+          </div>
+        </header>
+
+        <main class="content">
+          <section class="email-detail" aria-label="Mail detay düzeni">
+            <article class="card">
+              <header class="email-detail__header">
+                <h2 class="email-detail__subject">
+                  Ay sonu fatura özeti ve yeni özellikler hakkında güncelleme
+                </h2>
+                <div class="email-detail__meta">
+                  <div class="email-detail__from">
+                    <div class="email-detail__avatar">S</div>
+                    <div>
+                      <div>
+                        <strong>Stripe Billing</strong>
+                        <span class="u-text-muted">&lt;no-reply@stripe.com&gt;</span>
+                      </div>
+                      <div class="u-text-muted">Kime: sana</div>
+                    </div>
+                  </div>
+                  <div style="text-align: right">
+                    <div class="u-text-muted">Bugün • 10:21</div>
+                    <div style="margin-top: 0.25rem">
+                      <button class="btn btn--secondary btn--sm" type="button">
+                        <i class="fa-solid fa-reply"></i>
+                        Yanıtla
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </header>
+
+              <article class="email-detail__body">
+                <p>Merhaba,</p>
+                <p style="margin-top: 0.75rem">
+                  Bu mail; EmailThema workspace'in için oluşturulan Stripe fatura özetini
+                  ve yeni yayınladığımız özellikleri içermektedir.
+                </p>
+                <p style="margin-top: 0.75rem">
+                  Bu ay toplam
+                  <strong>31.204 sayfa görüntülenmesi</strong> ve
+                  <strong>12.438 oturum</strong>
+                  gerçekleşti. Aktif gönderim limitini aşmadığın için ek ücret
+                  yansıtılmamıştır.
+                </p>
+                <p style="margin-top: 0.75rem">
+                  Yeni özellikler:
+                </p>
+                <ul style="margin: 0.5rem 0 0.5rem 1.3rem">
+                  <li>Gelişmiş segmentasyon kuralları</li>
+                  <li>Gerçek zamanlı cihaz bazlı raporlama</li>
+                  <li>Webhook ile dış sistem entegrasyonları</li>
+                </ul>
+                <p style="margin-top: 0.75rem">
+                  Soruların için her zaman bizimle iletişime geçebilirsin.
+                </p>
+                <p style="margin-top: 0.75rem">Sevgiler,<br />Stripe Ekibi</p>
+              </article>
+
+              <section class="email-detail__attachments" aria-label="Ekler">
+                <header class="card__header">
+                  <p class="card__title">Ekler</p>
+                  <span class="u-text-muted" style="font-size: 0.8rem">2 dosya • 1.8MB</span>
+                </header>
+                <div class="email-detail__attachment-list">
+                  <div class="email-detail__attachment">
+                    <div>
+                      <strong>invoice-0126.pdf</strong>
+                      <div class="u-text-muted">PDF • 1.2MB</div>
+                    </div>
+                    <button class="btn btn--secondary btn--sm" type="button">
+                      <i class="fa-solid fa-download"></i>
+                    </button>
+                  </div>
+                  <div class="email-detail__attachment">
+                    <div>
+                      <strong>feature-changelog.md</strong>
+                      <div class="u-text-muted">Markdown • 620KB</div>
+                    </div>
+                    <button class="btn btn--secondary btn--sm" type="button">
+                      <i class="fa-solid fa-download"></i>
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </article>
+
+            <aside class="card card--soft">
+              <header class="card__header">
+                <p class="card__title">Zaman çizelgesi</p>
+              </header>
+              <div class="email-detail__timeline">
+                <div class="email-detail__timeline-item">
+                  <span>Gönderildi</span>
+                  <span class="u-text-muted">Bugün • 10:21</span>
+                </div>
+                <div class="email-detail__timeline-item">
+                  <span>Açıldı</span>
+                  <span class="u-text-success">+12sn içinde</span>
+                </div>
+                <div class="email-detail__timeline-item">
+                  <span>Cihaz</span>
+                  <span class="u-text-muted">MacOS • Chrome</span>
+                </div>
+                <div class="email-detail__timeline-item">
+                  <span>Konum</span>
+                  <span class="u-text-muted">İstanbul, TR</span>
+                </div>
+              </div>
+
+              <header class="card__header" style="margin-top: 0.8rem">
+                <p class="card__title">Hızlı aksiyonlar</p>
+              </header>
+              <div style="display: flex; flex-direction: column; gap: 0.4rem">
+                <button class="btn btn--secondary btn--sm" type="button">
+                  <i class="fa-solid fa-tag"></i>
+                  <span>Etiket ekle</span>
+                </button>
+                <button class="btn btn--secondary btn--sm" type="button">
+                  <i class="fa-solid fa-circle-exclamation"></i>
+                  <span>Önemli olarak işaretle</span>
+                </button>
+                <button class="btn btn--secondary btn--sm" type="button">
+                  <i class="fa-solid fa-clock-rotate-left"></i>
+                  <span>Daha sonra hatırlat</span>
+                </button>
+              </div>
+            </aside>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script src="wwwroot/js/script.js"></script>
+  </body>
+</html>
+

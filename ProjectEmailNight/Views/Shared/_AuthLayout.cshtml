@@ -1,0 +1,23 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - EmailNight</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" 
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPk5dHu5K9dKl8Rl6cCfQ76cEmkC0QdOHQ88vJd2H/05+Yl4dX+IT3Ug==" 
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <link rel="stylesheet" href="~/emailthema/css/style.css">
+</head>
+<body>
+@RenderBody()
+    
+<script src="~/emailthema/js/script.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

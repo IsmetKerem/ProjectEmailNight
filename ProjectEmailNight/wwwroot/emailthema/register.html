@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EmailThema - Kayıt Ol</title>
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPk5dHu5K9dKl8Rl6cCfQ76cEmkC0QdOHQ88vJd2H/05+Yl4dX+IT3Ug=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <link rel="stylesheet" href="wwwroot/css/style.css" />
+  </head>
+  <body>
+    <div class="auth-layout">
+      <section class="auth-layout__panel">
+        <article class="auth-layout__card" aria-labelledby="register-title">
+          <header class="auth-layout__logo">
+            <div class="auth-layout__logo-icon">
+              <i class="fa-solid fa-envelope-circle-check"></i>
+            </div>
+            <div>
+              <div class="auth-layout__logo-text">EmailThema</div>
+              <div class="u-text-muted" style="font-size: 0.8rem">
+                Takımınız için akıllı email yönetimi
+              </div>
+            </div>
+          </header>
+
+          <main>
+            <h1 id="register-title" class="auth-layout__title">
+              Hesabını birkaç adımda oluştur
+            </h1>
+            <p class="auth-layout__subtitle">
+              Kişisel veya ekip hesabı ile toplu mailleri, kampanyaları ve destek
+              kutunuzu tek yerden yönetin.
+            </p>
+
+            <form class="auth-form" novalidate>
+              <div class="auth-form__group">
+                <label class="auth-form__label" for="register-name">
+                  <span>Ad Soyad</span>
+                </label>
+                <div class="auth-form__control">
+                  <span class="auth-form__icon">
+                    <i class="fa-solid fa-user"></i>
+                  </span>
+                  <input
+                    class="auth-form__input"
+                    type="text"
+                    id="register-name"
+                    name="name"
+                    autocomplete="name"
+                    placeholder="Örnek Kullanıcı"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="auth-form__group">
+                <label class="auth-form__label" for="register-email">
+                  <span>İş e-postası</span>
+                </label>
+                <div class="auth-form__control">
+                  <span class="auth-form__icon">
+                    <i class="fa-solid fa-at"></i>
+                  </span>
+                  <input
+                    class="auth-form__input"
+                    type="email"
+                    id="register-email"
+                    name="email"
+                    autocomplete="email"
+                    placeholder="ornek@firma.com"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="auth-form__group">
+                <label class="auth-form__label" for="register-password">
+                  <span>Şifre</span>
+                </label>
+                <div class="auth-form__control">
+                  <span class="auth-form__icon">
+                    <i class="fa-solid fa-lock"></i>
+                  </span>
+                  <input
+                    class="auth-form__input"
+                    type="password"
+                    id="register-password"
+                    name="password"
+                    autocomplete="new-password"
+                    placeholder="En az 8 karakter"
+                    required
+                  />
+                  <button
+                    type="button"
+                    aria-label="Şifreyi göster"
+                    class="auth-form__toggle fa-solid fa-eye"
+                    data-password-toggle="#register-password"
+                  ></button>
+                </div>
+              </div>
+
+              <div class="auth-form__group">
+                <label class="auth-form__label" for="register-confirm">
+                  <span>Şifre tekrar</span>
+                </label>
+                <div class="auth-form__control">
+                  <span class="auth-form__icon">
+                    <i class="fa-solid fa-lock-keyhole"></i>
+                  </span>
+                  <input
+                    class="auth-form__input"
+                    type="password"
+                    id="register-confirm"
+                    name="passwordConfirm"
+                    autocomplete="new-password"
+                    placeholder="Şifreni tekrar yaz"
+                    required
+                  />
+                  <button
+                    type="button"
+                    aria-label="Şifreyi göster"
+                    class="auth-form__toggle fa-solid fa-eye"
+                    data-password-toggle="#register-confirm"
+                  ></button>
+                </div>
+              </div>
+
+              <div class="auth-form__meta">
+                <label class="auth-form__checkbox">
+                  <input type="checkbox" name="terms" required />
+                  <span>
+                    <span class="u-text-muted">Kullanım şartlarını kabul ediyorum</span>
+                  </span>
+                </label>
+              </div>
+
+              <div class="auth-form__actions">
+                <button type="submit" class="btn btn--primary">
+                  <span>Hesap oluştur</span>
+                  <i class="fa-solid fa-user-plus"></i>
+                </button>
+              </div>
+            </form>
+
+            <footer class="auth-layout__footer">
+              <p>
+                Zaten hesabın var mı?
+                <a href="login.html">Giriş yap</a>
+              </p>
+            </footer>
+          </main>
+        </article>
+      </section>
+    </div>
+
+    <script src="wwwroot/js/script.js"></script>
+  </body>
+</html>
+

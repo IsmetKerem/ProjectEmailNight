@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EmailThema - Giriş</title>
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPk5dHu5K9dKl8Rl6cCfQ76cEmkC0QdOHQ88vJd2H/05+Yl4dX+IT3Ug=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <link rel="stylesheet" href="wwwroot/css/style.css" />
+  </head>
+  <body>
+    <div class="auth-layout">
+      <section class="auth-layout__panel">
+        <article class="auth-layout__card" aria-labelledby="login-title">
+          <header class="auth-layout__logo">
+            <div class="auth-layout__logo-icon">
+              <i class="fa-solid fa-envelope-open-text"></i>
+            </div>
+            <div>
+              <div class="auth-layout__logo-text">EmailThema</div>
+              <div class="u-text-muted" style="font-size: 0.8rem">
+                Modern email yönetim platformu
+              </div>
+            </div>
+          </header>
+
+          <main>
+            <h1 id="login-title" class="auth-layout__title">Tekrar hoş geldin</h1>
+            <p class="auth-layout__subtitle">
+              Hesabına giriş yap ve gelen kutunu, kampanyalarını ve ekip iletişimini
+              tek panelden yönet.
+            </p>
+
+            <form class="auth-form" novalidate>
+              <div class="auth-form__group">
+                <label class="auth-form__label" for="login-email">
+                  <span>E-posta adresi</span>
+                </label>
+                <div class="auth-form__control">
+                  <span class="auth-form__icon">
+                    <i class="fa-solid fa-at"></i>
+                  </span>
+                  <input
+                    class="auth-form__input"
+                    type="email"
+                    id="login-email"
+                    name="email"
+                    autocomplete="email"
+                    placeholder="ornek@firma.com"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="auth-form__group">
+                <label class="auth-form__label" for="login-password">
+                  <span>Şifre</span>
+                </label>
+                <div class="auth-form__control">
+                  <span class="auth-form__icon">
+                    <i class="fa-solid fa-lock"></i>
+                  </span>
+                  <input
+                    class="auth-form__input"
+                    type="password"
+                    id="login-password"
+                    name="password"
+                    autocomplete="current-password"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button
+                    type="button"
+                    aria-label="Şifreyi göster"
+                    class="auth-form__toggle fa-solid fa-eye"
+                    data-password-toggle="#login-password"
+                  ></button>
+                </div>
+              </div>
+
+              <div class="auth-form__meta">
+                <label class="auth-form__checkbox">
+                  <input type="checkbox" name="remember" />
+                  <span>Beni hatırla</span>
+                </label>
+                <a href="#" class="auth-form__link">Şifremi unuttum</a>
+              </div>
+
+              <div class="auth-form__actions">
+                <button type="submit" class="btn btn--primary">
+                  <span>Giriş yap</span>
+                  <i class="fa-solid fa-arrow-right-long"></i>
+                </button>
+              </div>
+            </form>
+
+            <footer class="auth-layout__footer">
+              <p>
+                Hesabın yok mu?
+                <a href="register.html">Yeni bir hesap oluştur</a>
+              </p>
+            </footer>
+          </main>
+        </article>
+      </section>
+    </div>
+
+    <script src="wwwroot/js/script.js"></script>
+  </body>
+</html>
+

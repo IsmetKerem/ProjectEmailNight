@@ -1,0 +1,148 @@
+@model ProjectEmailNight.Models.ProfileViewModel
+@{
+    ViewData["Title"] = "Profil";
+    ViewData["PageTitle"] = "Profil ve hesap ayarları";
+}
+
+<section class="profile" aria-label="Profil düzeni">
+    <article class="card">
+        <header class="profile__header">
+            <div class="profile__avatar">
+                @if(!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" alt="@Model.FullName" style="width: 100%; height: 100%; border-radius: inherit; object-fit: cover;">
+                }
+                else
+                {
+                    <div class="profile__avatar-inner">@Model.Initials</div>
+                }
+            </div>
+            <div>
+                <h2 class="profile__name">@Model.FullName</h2>
+                <p class="profile__role">@(Model.About ?? "EmailNight Kullanıcısı")</p>
+                <div class="u-text-muted" style="font-size: 0.8rem">
+                    @Model.Email
+                </div>
+            </div>
+        </header>
+
+        <section aria-label="İstatistikler" style="margin-top: 1.5rem">
+            <div class="profile__stats">
+                <div class="profile__stat">
+                    <div class="profile__stat-value">@Model.SentEmailsCount.ToString("N0")</div>
+                    <div>Gönderilen mail</div>
+                </div>
+                <div class="profile__stat">
+                    <div class="profile__stat-value">@Model.ReceivedEmailsCount.ToString("N0")</div>
+                    <div>Alınan mail</div>
+                </div>
+                <div class="profile__stat">
+                    <div class="profile__stat-value">%@Model.ReplyRate</div>
+                    <div>Okunma oranı</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="profile__activity" aria-label="Son aktiviteler" style="margin-top: 1.5rem">
+            <h3 class="profile__settings-title">Son aktiviteler</h3>
+            <div class="profile__activity-list">
+                @if(Model.RecentActivities.Any())
+                {
+                    @foreach(var activity in Model.RecentActivities)
+                    {
+                        <div class="profile__activity-item">
+                            <span>
+                                <i class="fa-solid @activity.Icon" style="color: @activity.IconColor; margin-right: 0.5rem;"></i>
+                                @activity.Description
+                            </span>
+                            <span class="u-text-muted">@activity.TimeAgo</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="u-text-muted" style="text-align: center; padding: 1rem;">
+                        Henüz aktivite yok
+                    </div>
+                }
+            </div>
+        </section>
+
+        <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem;">
+            <a asp-action="Edit" class="btn btn--primary btn--sm">
+                <i class="fa-solid fa-pen"></i>
+                <span>Profili Düzenle</span>
+            </a>
+            <a asp-action="ChangePassword" class="btn btn--secondary btn--sm">
+                <i class="fa-solid fa-key"></i>
+                <span>Şifre Değiştir</span>
+            </a>
+        </div>
+    </article>
+
+    <aside class="card card--soft">
+        <section class="profile__settings-group" aria-label="Hesap bilgileri">
+            <h3 class="profile__settings-title">Hesap Bilgileri</h3>
+            <div class="profile__settings-row">
+                <span>Kullanıcı adı</span>
+                <span class="u-text-muted">@Model.UserName</span>
+            </div>
+            <div class="profile__settings-row">
+                <span>Kayıt tarihi</span>
+                <span class="u-text-muted">@Model.CreatedAt.ToString("dd MMM yyyy")</span>
+            </div>
+            <div class="profile__settings-row">
+                <span>Son giriş</span>
+                <span class="u-text-muted">
+                    @if(Model.LastLoginAt.HasValue)
+                    {
+                        @Model.LastLoginAt.Value.ToString("dd MMM yyyy HH:mm")
+                    }
+                    else
+                    {
+                        <text>-</text>
+                    }
+                </span>
+            </div>
+        </section>
+
+        <section class="profile__settings-group" aria-label="E-posta istatistikleri">
+            <h3 class="profile__settings-title">E-posta Özeti</h3>
+            <div class="profile__settings-row">
+                <span>Toplam e-posta</span>
+                <span class="u-text-muted">@((Model.SentEmailsCount + Model.ReceivedEmailsCount).ToString("N0"))</span>
+            </div>
+            <div class="profile__settings-row">
+                <span>Yıldızlı</span>
+                <span class="u-text-muted">@Model.StarredCount</span>
+            </div>
+        </section>
+
+        <section class="profile__settings-group" aria-label="Hızlı işlemler">
+            <h3 class="profile__settings-title">Hızlı İşlemler</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <a asp-controller="Email" asp-action="Compose" class="btn btn--secondary btn--sm">
+                    <i class="fa-solid fa-pen"></i>
+                    <span>Yeni E-posta</span>
+                </a>
+                <a asp-controller="Email" asp-action="Inbox" class="btn btn--secondary btn--sm">
+                    <i class="fa-solid fa-inbox"></i>
+                    <span>Gelen Kutusu</span>
+                </a>
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit" class="btn btn--secondary btn--sm" style="width: 100%;">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span>Çıkış Yap</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+    </aside>
+</section>
+
+@if(TempData["Success"] != null)
+{
+    <script>
+        alert('@TempData["Success"]');
+    </script>
+}

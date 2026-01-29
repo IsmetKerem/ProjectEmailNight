@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EmailThema - Gelen Kutusu</title>
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPk5dHu5K9dKl8Rl6cCfQ76cEmkC0QdOHQ88vJd2H/05+Yl4dX+IT3Ug=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <link rel="stylesheet" href="wwwroot/css/style.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="layout__sidebar sidebar">
+        <div class="sidebar__brand">
+          <div class="sidebar__brand-main">
+            <div class="sidebar__logo">
+              <i class="fa-solid fa-paper-plane"></i>
+            </div>
+            <div>
+              <div class="sidebar__title">EmailThema</div>
+              <div class="sidebar__tagline">Control your inbox</div>
+            </div>
+          </div>
+          <button class="sidebar__toggle" type="button" data-sidebar-toggle>
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+
+        <nav aria-label="Ana menü">
+          <p class="sidebar__section-title">Genel</p>
+          <ul class="sidebar__nav">
+            <li class="sidebar__item">
+              <a class="sidebar__link" href="dashboard.html">
+                <span class="sidebar__link-icon">
+                  <i class="fa-solid fa-chart-line"></i>
+                </span>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <a class="sidebar__link sidebar__link--active" href="inbox.html">
+                <span class="sidebar__link-icon">
+                  <i class="fa-solid fa-inbox"></i>
+                </span>
+                <span>Gelen kutusu</span>
+                <span class="sidebar__link-badge">24</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <a class="sidebar__link" href="compose.html">
+                <span class="sidebar__link-icon">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </span>
+                <span>Yeni mail</span>
+              </a>
+            </li>
+          </ul>
+
+          <p class="sidebar__section-title">Hesap</p>
+          <ul class="sidebar__nav">
+            <li class="sidebar__item">
+              <a class="sidebar__link" href="profile.html">
+                <span class="sidebar__link-icon">
+                  <i class="fa-solid fa-user-circle"></i>
+                </span>
+                <span>Profil</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <footer class="sidebar__footer">
+          <div>Filtrelenen mailler: <span class="u-text-muted">spam hariç</span></div>
+        </footer>
+      </aside>
+
+      <div class="layout__main">
+        <header class="topbar">
+          <div class="topbar__left">
+            <h1 class="topbar__title">Gelen kutusu</h1>
+            <div class="topbar__search">
+              <i class="fa-solid fa-magnifying-glass topbar__search-icon"></i>
+              <input
+                type="search"
+                class="topbar__search-input"
+                placeholder="Gönderen, konu veya etikete göre ara..."
+                aria-label="Gelen kutusunda ara"
+              />
+            </div>
+          </div>
+
+          <div class="topbar__right">
+            <button
+              class="topbar__icon-btn topbar__icon-btn--badge"
+              type="button"
+              aria-label="Bildirimler"
+            >
+              <span class="topbar__icon-badge"></span>
+              <i class="fa-regular fa-bell"></i>
+            </button>
+            <button class="topbar__profile" type="button">
+              <span class="topbar__avatar">İK</span>
+              <span class="topbar__user">
+                <span class="topbar__user-name">İsmet Kerem</span>
+                <span class="topbar__user-role">Workspace Owner</span>
+              </span>
+              <i class="fa-solid fa-chevron-down" style="font-size: 0.65rem"></i>
+            </button>
+          </div>
+        </header>
+
+        <main class="content">
+          <section class="inbox-layout" aria-label="Gelen kutusu düzeni">
+            <aside class="inbox-sidebar">
+              <div class="inbox-sidebar__compose">
+                <a href="compose.html" class="btn btn--compose">
+                  <i class="fa-solid fa-pen"></i>
+                  <span>Yeni mail</span>
+                </a>
+              </div>
+
+              <div>
+                <p class="sidebar__section-title">Klasörler</p>
+                <ul class="inbox-sidebar__folder-list">
+                  <li class="inbox-sidebar__item">
+                    <a
+                      href="inbox.html"
+                      class="inbox-sidebar__link inbox-sidebar__link--active"
+                    >
+                      <span class="inbox-sidebar__link-left">
+                        <span class="inbox-sidebar__link-icon">
+                          <i class="fa-solid fa-inbox"></i>
+                        </span>
+                        <span>Tüm mailler</span>
+                      </span>
+                      <span class="inbox-sidebar__badge">128</span>
+                    </a>
+                  </li>
+                  <li class="inbox-sidebar__item">
+                    <a href="#" class="inbox-sidebar__link">
+                      <span class="inbox-sidebar__link-left">
+                        <span class="inbox-sidebar__link-icon">
+                          <i class="fa-solid fa-star"></i>
+                        </span>
+                        <span>Yıldızlı</span>
+                      </span>
+                      <span class="inbox-sidebar__badge">12</span>
+                    </a>
+                  </li>
+                  <li class="inbox-sidebar__item">
+                    <a href="#" class="inbox-sidebar__link">
+                      <span class="inbox-sidebar__link-left">
+                        <span class="inbox-sidebar__link-icon">
+                          <i class="fa-regular fa-paper-plane"></i>
+                        </span>
+                        <span>Gönderilmiş</span>
+                      </span>
+                    </a>
+                  </li>
+                  <li class="inbox-sidebar__item">
+                    <a href="#" class="inbox-sidebar__link">
+                      <span class="inbox-sidebar__link-left">
+                        <span class="inbox-sidebar__link-icon">
+                          <i class="fa-regular fa-file-lines"></i>
+                        </span>
+                        <span>Taslaklar</span>
+                      </span>
+                      <span class="inbox-sidebar__badge">3</span>
+                    </a>
+                  </li>
+                  <li class="inbox-sidebar__item">
+                    <a href="#" class="inbox-sidebar__link">
+                      <span class="inbox-sidebar__link-left">
+                        <span class="inbox-sidebar__link-icon">
+                          <i class="fa-regular fa-trash-can"></i>
+                        </span>
+                        <span>Silinenler</span>
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <p class="sidebar__section-title">Etiketler</p>
+                <ul class="inbox-sidebar__label-list">
+                  <li class="inbox-sidebar__item">
+                    <a href="#" class="inbox-sidebar__link">
+                      <span class="inbox-sidebar__link-left">
+                        <span
+                          class="inbox-sidebar__label-dot inbox-sidebar__label-dot--primary"
+                        ></span>
+                        <span>Öncelikli</span>
+                      </span>
+                    </a>
+                  </li>
+                  <li class="inbox-sidebar__item">
+                    <a href="#" class="inbox-sidebar__link">
+                      <span class="inbox-sidebar__link-left">
+                        <span
+                          class="inbox-sidebar__label-dot inbox-sidebar__label-dot--secondary"
+                        ></span>
+                        <span>Pazarlama</span>
+                      </span>
+                    </a>
+                  </li>
+                  <li class="inbox-sidebar__item">
+                    <a href="#" class="inbox-sidebar__link">
+                      <span class="inbox-sidebar__link-left">
+                        <span
+                          class="inbox-sidebar__label-dot inbox-sidebar__label-dot--success"
+                        ></span>
+                        <span>Müşteri desteği</span>
+                      </span>
+                    </a>
+                  </li>
+                  <li class="inbox-sidebar__item">
+                    <a href="#" class="inbox-sidebar__link">
+                      <span class="inbox-sidebar__link-left">
+                        <span
+                          class="inbox-sidebar__label-dot inbox-sidebar__label-dot--warning"
+                        ></span>
+                        <span>Finans</span>
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </aside>
+
+            <section class="inbox-main" aria-label="Mail listesi">
+              <header class="inbox-main__toolbar">
+                <div class="inbox-main__toolbar-left">
+                  <input
+                    type="checkbox"
+                    class="inbox-main__checkbox"
+                    aria-label="Tüm mailleri seç"
+                  />
+                  <button class="btn btn--ghost" type="button">
+                    <i class="fa-solid fa-rotate-right"></i>
+                  </button>
+                  <button class="btn btn--ghost" type="button">
+                    <i class="fa-regular fa-square-minus"></i>
+                  </button>
+                  <button class="btn btn--ghost" type="button">
+                    <i class="fa-regular fa-folder"></i>
+                  </button>
+                </div>
+                <div class="inbox-main__toolbar-right">
+                  <span class="u-text-muted" style="font-size: 0.8rem">
+                    1–25 / 128
+                  </span>
+                  <button class="btn btn--ghost" type="button">
+                    <i class="fa-solid fa-chevron-left"></i>
+                  </button>
+                  <button class="btn btn--ghost" type="button">
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+                </div>
+              </header>
+
+              <div class="inbox-main__table-wrapper">
+                <table class="inbox-main__table">
+                  <thead class="inbox-main__thead">
+                    <tr>
+                      <th style="width: 40px">
+                        <input
+                          type="checkbox"
+                          class="inbox-main__checkbox"
+                          aria-label="Tüm mailleri seç"
+                        />
+                      </th>
+                      <th style="width: 40px"></th>
+                      <th>Gönderen</th>
+                      <th>Konu</th>
+                      <th>Etiket</th>
+                      <th style="text-align: right">Tarih</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="inbox-main__row" data-email-link>
+                      <td class="inbox-main__cell">
+                        <input type="checkbox" class="inbox-main__checkbox" />
+                      </td>
+                      <td class="inbox-main__cell">
+                        <i
+                          class="fa-solid fa-star inbox-main__star inbox-main__star--active"
+                          aria-label="Yıldızlı"
+                        ></i>
+                      </td>
+                      <td class="inbox-main__cell">
+                        <strong>Stripe Billing</strong>
+                      </td>
+                      <td class="inbox-main__cell inbox-main__subject">
+                        Ay sonu fatura özeti ve yeni özellikler hakkında güncelleme
+                      </td>
+                      <td class="inbox-main__cell">
+                        <span class="inbox-main__category inbox-main__category--primary">
+                          Önemli
+                        </span>
+                      </td>
+                      <td class="inbox-main__cell" style="text-align: right">
+                        10:21
+                      </td>
+                    </tr>
+
+                    <tr class="inbox-main__row" data-email-link>
+                      <td class="inbox-main__cell">
+                        <input type="checkbox" class="inbox-main__checkbox" />
+                      </td>
+                      <td class="inbox-main__cell">
+                        <i
+                          class="fa-regular fa-star inbox-main__star"
+                          aria-label="Yıldızsız"
+                        ></i>
+                      </td>
+                      <td class="inbox-main__cell">
+                        <strong>Product Hunt</strong>
+                      </td>
+                      <td class="inbox-main__cell inbox-main__subject">
+                        EmailThema lansman geri bildirimi ve öne çıkan yorumlar
+                      </td>
+                      <td class="inbox-main__cell">
+                        <span
+                          class="inbox-main__category inbox-main__category--secondary"
+                        >
+                          Pazarlama
+                        </span>
+                      </td>
+                      <td class="inbox-main__cell" style="text-align: right">
+                        09:12
+                      </td>
+                    </tr>
+
+                    <tr class="inbox-main__row" data-email-link>
+                      <td class="inbox-main__cell">
+                        <input type="checkbox" class="inbox-main__checkbox" />
+                      </td>
+                      <td class="inbox-main__cell">
+                        <i
+                          class="fa-regular fa-star inbox-main__star"
+                          aria-label="Yıldızsız"
+                        ></i>
+                      </td>
+                      <td class="inbox-main__cell">
+                        <strong>Müşteri Destek</strong>
+                      </td>
+                      <td class="inbox-main__cell inbox-main__subject">
+                        Yeni workspace için SMTP doğrulama isteği
+                      </td>
+                      <td class="inbox-main__cell">
+                        <span class="inbox-main__category inbox-main__category--success">
+                          Destek
+                        </span>
+                      </td>
+                      <td class="inbox-main__cell" style="text-align: right">
+                        08:47
+                      </td>
+                    </tr>
+
+                    <tr class="inbox-main__row" data-email-link>
+                      <td class="inbox-main__cell">
+                        <input type="checkbox" class="inbox-main__checkbox" />
+                      </td>
+                      <td class="inbox-main__cell">
+                        <i
+                          class="fa-regular fa-star inbox-main__star"
+                          aria-label="Yıldızsız"
+                        ></i>
+                      </td>
+                      <td class="inbox-main__cell">
+                        <strong>Finans Ekibi</strong>
+                      </td>
+                      <td class="inbox-main__cell inbox-main__subject">
+                        Ocak ayı e-posta gönderim maliyetleri ve tahmini bütçe
+                      </td>
+                      <td class="inbox-main__cell">
+                        <span class="inbox-main__category inbox-main__category--warning">
+                          Finans
+                        </span>
+                      </td>
+                      <td class="inbox-main__cell" style="text-align: right">
+                        Dün
+                      </td>
+                    </tr>
+
+                    <tr class="inbox-main__row" data-email-link>
+                      <td class="inbox-main__cell">
+                        <input type="checkbox" class="inbox-main__checkbox" />
+                      </td>
+                      <td class="inbox-main__cell">
+                        <i
+                          class="fa-solid fa-star inbox-main__star inbox-main__star--active"
+                          aria-label="Yıldızlı"
+                        ></i>
+                      </td>
+                      <td class="inbox-main__cell">
+                        <strong>Security Alerts</strong>
+                      </td>
+                      <td class="inbox-main__cell inbox-main__subject">
+                        Hesabınıza yeni bir cihazdan giriş yapıldı
+                      </td>
+                      <td class="inbox-main__cell">
+                        <span class="inbox-main__category inbox-main__category--danger">
+                          Güvenlik
+                        </span>
+                      </td>
+                      <td class="inbox-main__cell" style="text-align: right">
+                        Dün
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script src="wwwroot/js/script.js"></script>
+  </body>
+</html>
+

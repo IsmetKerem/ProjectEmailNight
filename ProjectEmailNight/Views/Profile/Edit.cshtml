@@ -1,0 +1,58 @@
+@model ProjectEmailNight.Models.EditProfileViewModel
+@{
+    ViewData["Title"] = "Profili Düzenle";
+    ViewData["PageTitle"] = "Profili Düzenle";
+}
+
+<div style="max-width: 600px;">
+    <article class="card">
+        <header class="card__header">
+            <p class="card__title">Profil Bilgilerini Düzenle</p>
+        </header>
+
+        <form asp-action="Edit" method="post" enctype="multipart/form-data" style="margin-top: 1rem;">
+            <div class="compose__row" style="border-bottom: 1px solid #1f2937; padding-bottom: 1rem; margin-bottom: 1rem;">
+                <label class="compose__label">Fotoğraf</label>
+                <div style="flex: 1;">
+                    <input type="file" asp-for="ProfileImage" accept="image/*" class="compose__input" style="padding: 0.5rem;" />
+                    <span class="u-text-muted" style="font-size: 0.75rem;">JPG, PNG - Max 2MB</span>
+                </div>
+            </div>
+
+            <div class="compose__row" style="border-bottom: 1px solid #1f2937; padding-bottom: 1rem; margin-bottom: 1rem;">
+                <label asp-for="Name" class="compose__label">Ad</label>
+                <div style="flex: 1;">
+                    <input asp-for="Name" type="text" class="compose__input" placeholder="Adınız" />
+                    <span asp-validation-for="Name" style="color: #ef4444; font-size: 0.75rem;"></span>
+                </div>
+            </div>
+
+            <div class="compose__row" style="border-bottom: 1px solid #1f2937; padding-bottom: 1rem; margin-bottom: 1rem;">
+                <label asp-for="Surname" class="compose__label">Soyad</label>
+                <div style="flex: 1;">
+                    <input asp-for="Surname" type="text" class="compose__input" placeholder="Soyadınız" />
+                    <span asp-validation-for="Surname" style="color: #ef4444; font-size: 0.75rem;"></span>
+                </div>
+            </div>
+
+            <div class="compose__row" style="border-bottom: none; padding-bottom: 0; margin-bottom: 1rem;">
+                <label asp-for="About" class="compose__label">Hakkımda</label>
+                <div style="flex: 1;">
+                    <textarea asp-for="About" class="compose__input" rows="3" placeholder="Kendiniz hakkında kısa bir bilgi..." style="resize: vertical;"></textarea>
+                    <span asp-validation-for="About" style="color: #ef4444; font-size: 0.75rem;"></span>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+                <button type="submit" class="btn btn--primary">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Kaydet</span>
+                </button>
+                <a asp-action="Index" class="btn btn--secondary">
+                    <i class="fa-solid fa-xmark"></i>
+                    <span>İptal</span>
+                </a>
+            </div>
+        </form>
+    </article>
+</div>

@@ -1,0 +1,102 @@
+@model ProjectEmailNight.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Giriş Yap";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="auth-layout">
+    <section class="auth-layout__panel">
+        <article class="auth-layout__card" aria-labelledby="login-title">
+            <header class="auth-layout__logo">
+                <div class="auth-layout__logo-icon">
+                    <i class="fa-solid fa-envelope-open-text"></i>
+                </div>
+                <div>
+                    <div class="auth-layout__logo-text">EmailNight</div>
+                    <div class="u-text-muted" style="font-size: 0.8rem">
+                        Modern email yönetim platformu
+                    </div>
+                </div>
+            </header>
+
+            <main>
+                <h1 id="login-title" class="auth-layout__title">Tekrar hoş geldin</h1>
+                <p class="auth-layout__subtitle">
+                    Hesabına giriş yap ve gelen kutunu, kampanyalarını ve ekip iletişimini
+                    tek panelden yönet.
+                </p>
+
+                <!-- Hata Mesajları -->
+                <div asp-validation-summary="ModelOnly" class="auth-form__error-box"></div>
+
+                <form asp-action="Login" asp-controller="Account" method="post" class="auth-form" novalidate>
+                    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+                    
+                    <div class="auth-form__group">
+                        <label class="auth-form__label" asp-for="EmailOrUsername">
+                            <span>E-posta veya Kullanıcı Adı</span>
+                        </label>
+                        <div class="auth-form__control">
+                            <span class="auth-form__icon">
+                                <i class="fa-solid fa-at"></i>
+                            </span>
+                            <input asp-for="EmailOrUsername"
+                                   class="auth-form__input"
+                                   type="text"
+                                   autocomplete="email"
+                                   placeholder="ornek@firma.com" />
+                        </div>
+                        <span asp-validation-for="EmailOrUsername" class="auth-form__error"></span>
+                    </div>
+
+                    <div class="auth-form__group">
+                        <label class="auth-form__label" asp-for="Password">
+                            <span>Şifre</span>
+                        </label>
+                        <div class="auth-form__control">
+                            <span class="auth-form__icon">
+                                <i class="fa-solid fa-lock"></i>
+                            </span>
+                            <input asp-for="Password"
+                                   class="auth-form__input"
+                                   type="password"
+                                   autocomplete="current-password"
+                                   placeholder="••••••••" />
+                            <button type="button"
+                                    aria-label="Şifreyi göster"
+                                    class="auth-form__toggle fa-solid fa-eye"
+                                    data-password-toggle="#Password"></button>
+                        </div>
+                        <span asp-validation-for="Password" class="auth-form__error"></span>
+                    </div>
+
+                    <div class="auth-form__meta">
+                        <label class="auth-form__checkbox">
+                            <input asp-for="RememberMe" type="checkbox" />
+                            <span>Beni hatırla</span>
+                        </label>
+                        <a href="#" class="auth-form__link">Şifremi unuttum</a>
+                    </div>
+
+                    <div class="auth-form__actions">
+                        <button type="submit" class="btn btn--primary">
+                            <span>Giriş yap</span>
+                            <i class="fa-solid fa-arrow-right-long"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <footer class="auth-layout__footer">
+                    <p>
+                        Hesabın yok mu?
+                        <a asp-action="Register" asp-controller="Account">Yeni bir hesap oluştur</a>
+                    </p>
+                </footer>
+            </main>
+        </article>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

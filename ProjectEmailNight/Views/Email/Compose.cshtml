@@ -1,0 +1,361 @@
+@model ProjectEmailNight.Models.ComposeViewModel
+@{
+    ViewData["Title"] = "Yeni E-posta";
+    ViewData["PageTitle"] = "Yeni mail oluştur";
+}
+
+<section class="compose" aria-label="Yeni mail formu">
+    <article class="compose__form">
+        <form asp-action="Compose" asp-controller="Email" method="post" id="compose-form" enctype="multipart/form-data">
+            <input type="hidden" asp-for="ReplyToId" />
+            <input type="hidden" asp-for="Body" id="body-hidden" />
+            
+            @if(Model?.ReplyToId != null)
+            {
+                <div class="compose__reply-banner">
+                    <i class="fa-solid fa-reply"></i>
+                    <span><strong>@Model.ReplyToSender</strong> adlı kişiye yanıt yazıyorsunuz</span>
+                </div>
+            }
+            
+            <div class="compose__row">
+                <div class="compose__label">Kime</div>
+                <div style="flex: 1;">
+                    <input asp-for="ReceiverEmail" 
+                           type="email" 
+                           class="compose__input" 
+                           placeholder="alici@domain.com"
+                           list="user-list"
+                           autocomplete="off" />
+                    <datalist id="user-list">
+                        @if(ViewBag.Users != null)
+                        {
+                            foreach(var u in (dynamic)ViewBag.Users)
+                            {
+                                <option value="@u.Email">@u.FullName</option>
+                            }
+                        }
+                    </datalist>
+                    <span asp-validation-for="ReceiverEmail" style="color: #ef4444; font-size: 0.75rem;"></span>
+                </div>
+            </div>
+
+            <div class="compose__row">
+                <div class="compose__label">Konu</div>
+                <div style="flex: 1;">
+                    <input asp-for="Subject" 
+                           type="text" 
+                           class="compose__input" 
+                           placeholder="E-posta konusu..." />
+                    <span asp-validation-for="Subject" style="color: #ef4444; font-size: 0.75rem;"></span>
+                </div>
+            </div>
+
+            <div class="compose__editor-container">
+                <div id="quill-editor">@Html.Raw(Model?.Body ?? "")</div>
+            </div>
+
+            <div class="compose__attachments-preview" id="attachments-preview" style="display: none;">
+                <div class="compose__attachments-list" id="attachments-list"></div>
+            </div>
+
+            <div class="compose__footer">
+                <div class="compose__actions">
+                    <button type="submit" name="IsDraft" value="false" class="btn btn--primary">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Gönder</span>
+                    </button>
+                    
+                    <div class="compose__toolbar-buttons">
+                        <button type="button" class="compose__toolbar-btn" onclick="document.getElementById('file-input').click()" title="Dosya ekle">
+                            <i class="fa-solid fa-paperclip"></i>
+                        </button>
+                        <button type="button" class="compose__toolbar-btn" title="Emoji" id="emoji-btn">
+                            <i class="fa-regular fa-face-smile"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="compose__meta-buttons">
+                    <button type="submit" name="IsDraft" value="true" class="compose__toolbar-btn" title="Taslak kaydet">
+                        <i class="fa-regular fa-floppy-disk"></i>
+                    </button>
+                    <button type="button" class="compose__toolbar-btn" title="Sil" onclick="if(confirm('E-postayı silmek istediğinize emin misiniz?')) window.location.href='@Url.Action("Inbox")'">
+                        <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <input type="file" name="attachments" id="file-input" style="display: none;" multiple onchange="handleFiles(this.files)" />
+        </form>
+    </article>
+
+    <aside class="compose__sidebar">
+        <article class="card card--soft">
+            <header class="card__header">
+                <p class="card__title">
+                    <i class="fa-solid fa-circle-info" style="margin-right: 0.5rem; color: #60a5fa;"></i>
+                    Bilgi
+                </p>
+            </header>
+            <p class="compose__summary">
+                E-postanız gönderildikten sonra karşı taraf aynı formatta görüntüleyebilir.
+            </p>
+            <div class="compose__chips">
+                <span class="compose__chip"><i class="fa-solid fa-bolt"></i> Anında iletim</span>
+                <span class="compose__chip"><i class="fa-solid fa-eye"></i> Okundu bildirimi</span>
+            </div>
+        </article>
+
+        <article class="card card--soft">
+            <header class="card__header">
+                <p class="card__title">
+                    <i class="fa-solid fa-keyboard" style="margin-right: 0.5rem; color: #a78bfa;"></i>
+                    Kısayollar
+                </p>
+            </header>
+            <div style="font-size: 0.8rem; color: #9ca3af;">
+                <div style="display: flex; justify-content: space-between; padding: 0.3rem 0;">
+                    <span><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>
+                    <span>Gönder</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.3rem 0;">
+                    <span><kbd>Ctrl</kbd>+<kbd>B</kbd></span>
+                    <span>Kalın</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.3rem 0;">
+                    <span><kbd>Ctrl</kbd>+<kbd>I</kbd></span>
+                    <span>İtalik</span>
+                </div>
+            </div>
+        </article>
+    </aside>
+</section>
+
+@section Styles {
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    <style>
+        .compose__reply-banner {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(236, 72, 153, 0.1));
+            padding: 0.75rem 1.25rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .compose__reply-banner i { color: #a78bfa; }
+        
+        .compose__editor-container {
+            border-bottom: 1px solid #1f2937;
+        }
+        
+        #quill-editor {
+            height: 350px;
+            background: transparent;
+            color: #f9fafb;
+        }
+        
+        .ql-toolbar.ql-snow {
+            background: #0f172a;
+            border: none !important;
+            border-bottom: 1px solid #1f2937 !important;
+        }
+        
+        .ql-container.ql-snow {
+            border: none !important;
+        }
+        
+        .ql-editor {
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        
+        .ql-editor.ql-blank::before {
+            color: #4b5563;
+            font-style: normal;
+        }
+        
+        .ql-snow .ql-stroke { stroke: #9ca3af; }
+        .ql-snow .ql-fill { fill: #9ca3af; }
+        .ql-snow .ql-picker { color: #9ca3af; }
+        .ql-snow .ql-picker-options { background: #1f2937; border-color: #374151; }
+        
+        .ql-toolbar button:hover .ql-stroke,
+        .ql-toolbar button.ql-active .ql-stroke { stroke: #f9fafb; }
+        .ql-toolbar button:hover .ql-fill,
+        .ql-toolbar button.ql-active .ql-fill { fill: #f9fafb; }
+        
+        .compose__footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            background: rgba(15, 23, 42, 0.3);
+        }
+        
+        .compose__actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .compose__toolbar-buttons, .compose__meta-buttons {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .compose__toolbar-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: #9ca3af;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        
+        .compose__toolbar-btn:hover {
+            background: #1f2937;
+            color: #f9fafb;
+        }
+        
+        .compose__attachments-preview {
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid #1f2937;
+            background: rgba(15, 23, 42, 0.5);
+        }
+        
+        .compose__attachments-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .compose__attachment-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.75rem;
+            background: #1f2937;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .compose__attachment-remove {
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0;
+        }
+        
+        .compose__attachment-remove:hover { color: #ef4444; }
+        
+        kbd {
+            background: #1f2937;
+            padding: 0.1rem 0.35rem;
+            border-radius: 0.2rem;
+            font-size: 0.7rem;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <script>
+        var quill = new Quill('#quill-editor', {
+            theme: 'snow',
+            placeholder: 'E-postanızı buraya yazın...',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+        
+        // Form submit
+        document.getElementById('compose-form').addEventListener('submit', function(e) {
+            var html = quill.root.innerHTML;
+            if (html === '<p><br></p>') html = '';
+            document.getElementById('body-hidden').value = html;
+        });
+        
+        // Dosya ekleme
+        var attachedFiles = [];
+        
+        function handleFiles(files) {
+            for (var i = 0; i < files.length; i++) {
+                if (files[i].size <= 25 * 1024 * 1024) {
+                    attachedFiles.push(files[i]);
+                } else {
+                    alert('Dosya çok büyük: ' + files[i].name);
+                }
+            }
+            updateAttachmentsUI();
+        }
+        
+        function removeFile(index) {
+            attachedFiles.splice(index, 1);
+            updateAttachmentsUI();
+        }
+        
+        function updateAttachmentsUI() {
+            var preview = document.getElementById('attachments-preview');
+            var list = document.getElementById('attachments-list');
+            
+            if (attachedFiles.length === 0) {
+                preview.style.display = 'none';
+                return;
+            }
+            
+            preview.style.display = 'block';
+            list.innerHTML = '';
+            
+            attachedFiles.forEach(function(file, index) {
+                var size = file.size < 1024 * 1024 
+                    ? (file.size / 1024).toFixed(1) + ' KB'
+                    : (file.size / 1024 / 1024).toFixed(1) + ' MB';
+                    
+                list.innerHTML += '<div class="compose__attachment-item">' +
+                    '<i class="fa-regular fa-file"></i>' +
+                    '<span>' + file.name + '</span>' +
+                    '<span class="u-text-muted">(' + size + ')</span>' +
+                    '<button type="button" class="compose__attachment-remove" onclick="removeFile(' + index + ')">' +
+                    '<i class="fa-solid fa-xmark"></i></button></div>';
+            });
+        }
+        
+        // Ctrl+Enter gönder
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                document.querySelector('button[value="false"]').click();
+            }
+        });
+        // Mevcut script'lerin sonuna ekle:
+
+        // AI yanıtı varsa editöre ekle
+        document.addEventListener('DOMContentLoaded', function() {
+            var aiReply = sessionStorage.getItem('aiReply');
+            if (aiReply) {
+                sessionStorage.removeItem('aiReply');
+                // Quill editöre ekle (mevcut içeriğin başına)
+                var currentContent = quill.root.innerHTML;
+                if (currentContent === '<p><br></p>') {
+                    quill.root.innerHTML = '<p>' + aiReply.replace(/\n/g, '</p><p>') + '</p>';
+                } else {
+                    quill.root.innerHTML = '<p>' + aiReply.replace(/\n/g, '</p><p>') + '</p>' + currentContent;
+                }
+            }
+});
+    </script>
+}

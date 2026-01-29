@@ -1,0 +1,448 @@
+@model ProjectEmailNight.Models.EmailDetailViewModel
+@{
+    ViewData["Title"] = Model.Subject;
+    ViewData["PageTitle"] = "Mail detayı";
+    
+    string dateText;
+    if (Model.CreatedAt.Date == DateTime.UtcNow.Date)
+        dateText = $"Bugün • {Model.CreatedAt:HH:mm}";
+    else if (Model.CreatedAt.Date == DateTime.UtcNow.Date.AddDays(-1))
+        dateText = $"Dün • {Model.CreatedAt:HH:mm}";
+    else
+        dateText = Model.CreatedAt.ToString("dd MMM yyyy • HH:mm");
+}
+
+<section class="email-detail" aria-label="Mail detay düzeni">
+    <article class="card">
+        <header class="email-detail__header">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <a asp-controller="Email" asp-action="Inbox" class="btn btn--secondary btn--sm">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Geri</span>
+                </a>
+                <h2 class="email-detail__subject">
+                    @if(Model.IsStarred)
+                    {
+                        <i class="fa-solid fa-star" style="color: #facc15; margin-right: 0.5rem;"></i>
+                    }
+                    @Model.Subject
+                </h2>
+                @if(!string.IsNullOrEmpty(Model.CategoryName))
+                {
+                    <span class="u-badge" style="background: @(Model.CategoryColor)20; color: @Model.CategoryColor;">
+                        @Model.CategoryName
+                    </span>
+                }
+            </div>
+            
+            <div class="email-detail__meta">
+                <div class="email-detail__from">
+                    <div class="email-detail__avatar">@Model.SenderInitials</div>
+                    <div>
+                        <div>
+                            <strong class="email-detail__sender-name">@Model.SenderName</strong>
+                            <span class="u-text-muted">&lt;@Model.SenderEmail&gt;</span>
+                        </div>
+                        <div class="u-text-muted">Kime: @(Model.IsMine ? Model.ReceiverName : "ben")</div>
+                    </div>
+                </div>
+                <div style="text-align: right">
+                    <div class="u-text-muted">@dateText</div>
+                    <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; justify-content: flex-end;">
+                        @if(!Model.IsMine)
+                        {
+                            <a asp-controller="Email" asp-action="Compose" asp-route-replyTo="@Model.Id" class="btn btn--secondary btn--sm">
+                                <i class="fa-solid fa-reply"></i>
+                                <span>Yanıtla</span>
+                            </a>
+                        }
+                        <button type="button" class="btn btn--secondary btn--sm star-btn" data-id="@Model.Id">
+                            <i class="@(Model.IsStarred ? "fa-solid" : "fa-regular") fa-star"></i>
+                            <span>@(Model.IsStarred ? "Yıldızı Kaldır" : "Yıldızla")</span>
+                        </button>
+                        <form asp-action="Delete" method="post" style="display: inline;" onsubmit="return confirm('Silmek istediğinize emin misiniz?')">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn--secondary btn--sm">
+                                <i class="fa-regular fa-trash-can"></i>
+                                <span>Sil</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- AI Özet Bölümü -->
+        <div class="ai-summary-box" id="ai-summary-box">
+            <div class="ai-summary-header">
+                <div class="ai-summary-title">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>AI Özet</span>
+                </div>
+                <button type="button" class="ai-summary-refresh" onclick="regenerateAnalysis()" title="Yeniden analiz et">
+                    <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i>
+                </button>
+            </div>
+            <p class="ai-summary-text" id="ai-summary-text">
+                @if(!string.IsNullOrEmpty(Model.AISummary))
+                {
+                    @Model.AISummary
+                }
+                else
+                {
+                    <span class="u-text-muted">Özet oluşturuluyor...</span>
+                }
+            </p>
+        </div>
+
+        <article class="email-detail__body">
+            @Html.Raw(Model.Body)
+        </article>
+
+        @if(Model.Attachments.Any())
+        {
+            <section class="email-detail__attachments">
+                <header class="card__header">
+                    <p class="card__title">Ekler</p>
+                    <span class="u-text-muted" style="font-size: 0.8rem">@Model.Attachments.Count dosya</span>
+                </header>
+                <div class="email-detail__attachment-list">
+                    @foreach(var att in Model.Attachments)
+                    {
+                        <div class="email-detail__attachment">
+                            <div>
+                                <strong>@att.FileName</strong>
+                                <div class="u-text-muted">@att.FileSizeFormatted</div>
+                            </div>
+                            <a asp-action="DownloadAttachment" asp-route-id="@att.Id" class="btn btn--secondary btn--sm">
+                                <i class="fa-solid fa-download"></i>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </section>
+        }
+    </article>
+
+    <aside class="card card--soft">
+        <header class="card__header">
+            <p class="card__title">Zaman Çizelgesi</p>
+        </header>
+        <div class="email-detail__timeline">
+            <div class="email-detail__timeline-item">
+                <span>Gönderildi</span>
+                <span class="u-text-muted">@Model.CreatedAt.ToString("dd MMM • HH:mm")</span>
+            </div>
+            @if(Model.ReadAt.HasValue)
+            {
+                <div class="email-detail__timeline-item">
+                    <span>Okundu</span>
+                    <span class="u-text-success">@Model.ReadAt.Value.ToString("dd MMM • HH:mm")</span>
+                </div>
+            }
+        </div>
+
+        @if(!Model.IsMine)
+        {
+            <header class="card__header" style="margin-top: 1.25rem">
+                <p class="card__title">
+                    <i class="fa-solid fa-wand-magic-sparkles" style="margin-right: 0.5rem; color: #a78bfa;"></i>
+                    AI Yanıt Önerisi
+                </p>
+            </header>
+            <div class="ai-reply-section">
+                <div class="ai-reply-tones">
+                    <button type="button" class="ai-tone-btn ai-tone-btn--active" data-tone="professional">
+                        <i class="fa-solid fa-briefcase"></i>
+                        <span>Profesyonel</span>
+                    </button>
+                    <button type="button" class="ai-tone-btn" data-tone="friendly">
+                        <i class="fa-solid fa-face-smile"></i>
+                        <span>Samimi</span>
+                    </button>
+                    <button type="button" class="ai-tone-btn" data-tone="short">
+                        <i class="fa-solid fa-compress"></i>
+                        <span>Kısa</span>
+                    </button>
+                    <button type="button" class="ai-tone-btn" data-tone="formal">
+                        <i class="fa-solid fa-user-tie"></i>
+                        <span>Resmi</span>
+                    </button>
+                </div>
+                <button type="button" class="btn btn--primary btn--sm" style="width: 100%; margin-top: 0.75rem;" onclick="generateReply()">
+                    <i class="fa-solid fa-wand-magic-sparkles" id="reply-icon"></i>
+                    <span>Yanıt Önerisi Al</span>
+                </button>
+                <div class="ai-reply-result" id="ai-reply-result" style="display: none;">
+                    <div class="ai-reply-text" id="ai-reply-text"></div>
+                    <div class="ai-reply-actions">
+                        <button type="button" class="btn btn--secondary btn--sm" onclick="useReply()">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Kullan</span>
+                        </button>
+                        <button type="button" class="btn btn--secondary btn--sm" onclick="copyReply()">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>Kopyala</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <header class="card__header" style="margin-top: 1.25rem">
+            <p class="card__title">Hızlı Aksiyonlar</p>
+        </header>
+        <div class="email-detail__quick-actions">
+            @if(!Model.IsMine)
+            {
+                <a asp-action="Compose" asp-route-replyTo="@Model.Id" class="btn btn--secondary btn--sm btn--block">
+                    <i class="fa-solid fa-reply"></i>
+                    <span>Yanıtla</span>
+                </a>
+            }
+            <a asp-action="Inbox" class="btn btn--secondary btn--sm btn--block">
+                <i class="fa-solid fa-inbox"></i>
+                <span>Gelen Kutusuna Dön</span>
+            </a>
+        </div>
+    </aside>
+</section>
+
+@section Styles {
+<style>
+    .email-detail__sender-name {
+        color: #f9fafb;
+    }
+    
+    .email-detail__quick-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .btn--block {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .ai-summary-box {
+        background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(236, 72, 153, 0.08));
+        border: 1px solid rgba(124, 58, 237, 0.25);
+        border-radius: 0.75rem;
+        padding: 1rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .ai-summary-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .ai-summary-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #a78bfa;
+    }
+    
+    .ai-summary-refresh {
+        background: none;
+        border: none;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 0.25rem;
+        transition: all 0.2s;
+    }
+    
+    .ai-summary-refresh:hover {
+        color: #a78bfa;
+        background: rgba(124, 58, 237, 0.1);
+    }
+    
+    .ai-summary-refresh.loading i {
+        animation: spin 1s linear infinite;
+    }
+    
+    @@keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .ai-summary-text {
+        font-size: 0.9rem;
+        color: #d1d5db;
+        line-height: 1.6;
+        margin: 0;
+    }
+    
+    .ai-reply-section {
+        margin-top: 0.5rem;
+    }
+    
+    .ai-reply-tones {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.4rem;
+    }
+    
+    .ai-tone-btn {
+        padding: 0.5rem 0.6rem;
+        border-radius: 0.5rem;
+        border: 1px solid #1f2937;
+        background: transparent;
+        color: #9ca3af;
+        font-size: 0.75rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        transition: all 0.2s;
+    }
+    
+    .ai-tone-btn:hover {
+        border-color: #a78bfa;
+        color: #e5e7eb;
+    }
+    
+    .ai-tone-btn--active {
+        background: rgba(124, 58, 237, 0.15);
+        border-color: #a78bfa;
+        color: #a78bfa;
+    }
+    
+    .ai-reply-result {
+        margin-top: 0.75rem;
+        padding: 0.75rem;
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 0.5rem;
+        border: 1px solid #1f2937;
+    }
+    
+    .ai-reply-text {
+        font-size: 0.85rem;
+        color: #d1d5db;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        margin-bottom: 0.75rem;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    
+    .ai-reply-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+</style>
+}
+
+@section Scripts {
+<script>
+    var selectedTone = 'professional';
+    var generatedReply = '';
+    
+    // Tone seçimi
+    document.querySelectorAll('.ai-tone-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.ai-tone-btn').forEach(b => b.classList.remove('ai-tone-btn--active'));
+            this.classList.add('ai-tone-btn--active');
+            selectedTone = this.dataset.tone;
+        });
+    });
+    
+    // Yıldız toggle
+    document.querySelectorAll('.star-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const id = this.dataset.id;
+            const response = await fetch('@Url.Action("ToggleStar")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'id=' + id
+            });
+            const result = await response.json();
+            if (result.success) location.reload();
+        });
+    });
+    
+    // AI analiz yenileme
+    async function regenerateAnalysis() {
+        const btn = document.querySelector('.ai-summary-refresh');
+        const textEl = document.getElementById('ai-summary-text');
+        
+        btn.classList.add('loading');
+        textEl.innerHTML = '<span class="u-text-muted">Yeniden analiz ediliyor...</span>';
+        
+        try {
+            const response = await fetch('@Url.Action("RegenerateAnalysis")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'emailId=@Model.Id'
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                textEl.textContent = result.summary;
+            } else {
+                textEl.innerHTML = '<span class="u-text-danger">Analiz başarısız oldu</span>';
+            }
+        } catch (error) {
+            textEl.innerHTML = '<span class="u-text-danger">Bir hata oluştu</span>';
+        }
+        
+        btn.classList.remove('loading');
+    }
+    
+    // AI yanıt önerisi
+    async function generateReply() {
+        const icon = document.getElementById('reply-icon');
+        const resultBox = document.getElementById('ai-reply-result');
+        const textEl = document.getElementById('ai-reply-text');
+        
+        icon.className = 'fa-solid fa-spinner fa-spin';
+        resultBox.style.display = 'none';
+        
+        try {
+            const response = await fetch('@Url.Action("GenerateReply")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'emailId=@Model.Id&tone=' + selectedTone
+            });
+            const result = await response.json();
+            
+            if (result.success && result.reply) {
+                generatedReply = result.reply;
+                textEl.textContent = result.reply;
+                resultBox.style.display = 'block';
+            } else {
+                alert('Yanıt oluşturulamadı. API anahtarını kontrol edin.');
+            }
+        } catch (error) {
+            alert('Bir hata oluştu');
+        }
+        
+        icon.className = 'fa-solid fa-wand-magic-sparkles';
+    }
+    
+    // Yanıtı kullan
+    function useReply() {
+        if (generatedReply) {
+            const url = '@Url.Action("Compose", new { replyTo = Model.Id })';
+            sessionStorage.setItem('aiReply', generatedReply);
+            window.location.href = url;
+        }
+    }
+    
+    // Yanıtı kopyala
+    function copyReply() {
+        if (generatedReply) {
+            navigator.clipboard.writeText(generatedReply);
+            alert('Yanıt panoya kopyalandı!');
+        }
+    }
+</script>
+}

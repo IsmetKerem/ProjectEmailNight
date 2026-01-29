@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EmailThema - Dashboard</title>
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPk5dHu5K9dKl8Rl6cCfQ76cEmkC0QdOHQ88vJd2H/05+Yl4dX+IT3Ug=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <!-- Chart.js -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
+      defer
+    ></script>
+
+    <link rel="stylesheet" href="wwwroot/css/style.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="layout__sidebar sidebar">
+        <div class="sidebar__brand">
+          <div class="sidebar__brand-main">
+            <div class="sidebar__logo">
+              <i class="fa-solid fa-paper-plane"></i>
+            </div>
+            <div>
+              <div class="sidebar__title">EmailThema</div>
+              <div class="sidebar__tagline">Control your inbox</div>
+            </div>
+          </div>
+          <button class="sidebar__toggle" type="button" data-sidebar-toggle>
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+
+        <nav aria-label="Ana menü">
+          <p class="sidebar__section-title">Genel</p>
+          <ul class="sidebar__nav">
+            <li class="sidebar__item">
+              <a class="sidebar__link sidebar__link--active" href="dashboard.html">
+                <span class="sidebar__link-icon">
+                  <i class="fa-solid fa-chart-line"></i>
+                </span>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <a class="sidebar__link" href="inbox.html">
+                <span class="sidebar__link-icon">
+                  <i class="fa-solid fa-inbox"></i>
+                </span>
+                <span>Gelen kutusu</span>
+                <span class="sidebar__link-badge">24</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <a class="sidebar__link" href="compose.html">
+                <span class="sidebar__link-icon">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </span>
+                <span>Yeni mail</span>
+              </a>
+            </li>
+          </ul>
+
+          <p class="sidebar__section-title">Hesap</p>
+          <ul class="sidebar__nav">
+            <li class="sidebar__item">
+              <a class="sidebar__link" href="profile.html">
+                <span class="sidebar__link-icon">
+                  <i class="fa-solid fa-user-circle"></i>
+                </span>
+                <span>Profil</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <footer class="sidebar__footer">
+          <div>Son senkronizasyon: <span class="u-text-muted">2 dk önce</span></div>
+        </footer>
+      </aside>
+
+      <div class="layout__main">
+        <header class="topbar">
+          <div class="topbar__left">
+            <h1 class="topbar__title">Genel görünüm</h1>
+            <div class="topbar__search">
+              <i class="fa-solid fa-magnifying-glass topbar__search-icon"></i>
+              <input
+                type="search"
+                class="topbar__search-input"
+                placeholder="Maillerde ara..."
+                aria-label="Maillerde ara"
+              />
+            </div>
+          </div>
+
+          <div class="topbar__right">
+            <button
+              class="topbar__icon-btn topbar__icon-btn--badge"
+              type="button"
+              aria-label="Bildirimler"
+            >
+              <span class="topbar__icon-badge"></span>
+              <i class="fa-regular fa-bell"></i>
+            </button>
+            <button
+              class="topbar__icon-btn"
+              type="button"
+              aria-label="Tema değiştir"
+            >
+              <i class="fa-regular fa-moon"></i>
+            </button>
+            <button class="topbar__profile" type="button">
+              <span class="topbar__avatar">İK</span>
+              <span class="topbar__user">
+                <span class="topbar__user-name">İsmet Kerem</span>
+                <span class="topbar__user-role">Workspace Owner</span>
+              </span>
+              <i class="fa-solid fa-chevron-down" style="font-size: 0.65rem"></i>
+            </button>
+          </div>
+        </header>
+
+        <main class="content">
+          <section aria-label="Özet kartlar" class="dashboard-grid">
+            <article class="card">
+              <header class="card__header">
+                <div>
+                  <p class="card__title">Toplam oturum</p>
+                  <p class="card__value">12.438</p>
+                </div>
+                <span class="card__delta u-text-success">
+                  <i class="fa-solid fa-arrow-trend-up"></i>
+                  <span>%18</span>
+                </span>
+              </header>
+              <p class="card__meta">Son 7 gün / önceki haftaya göre</p>
+            </article>
+
+            <article class="card">
+              <header class="card__header">
+                <div>
+                  <p class="card__title">Ziyaretçi</p>
+                  <p class="card__value">7.920</p>
+                </div>
+                <span class="card__delta u-text-success">
+                  <i class="fa-solid fa-arrow-trend-up"></i>
+                  <span>%12</span>
+                </span>
+              </header>
+              <p class="card__meta">Tekil kullanıcı sayısı</p>
+            </article>
+
+            <article class="card">
+              <header class="card__header">
+                <div>
+                  <p class="card__title">Sayfa görüntülenme</p>
+                  <p class="card__value">31.204</p>
+                </div>
+                <span class="card__delta u-text-success">
+                  <i class="fa-solid fa-arrow-trend-up"></i>
+                  <span>%24</span>
+                </span>
+              </header>
+              <p class="card__meta">Tüm gelen kutuları & kampanyalar</p>
+            </article>
+
+            <article class="card">
+              <header class="card__header">
+                <div>
+                  <p class="card__title">Cevaplanma oranı</p>
+                  <p class="card__value">82%</p>
+                </div>
+                <span class="card__delta u-text-success">
+                  <i class="fa-solid fa-arrow-trend-up"></i>
+                  <span>+6 puan</span>
+                </span>
+              </header>
+              <p class="card__meta">Son 30 gün içinde</p>
+            </article>
+          </section>
+
+          <section class="dashboard-charts" aria-label="Grafikler">
+            <article class="card">
+              <header class="card__header">
+                <p class="card__title">Oturum trendi</p>
+                <span class="u-badge u-badge--info">Son 7 gün</span>
+              </header>
+              <div class="card__chart">
+                <canvas id="chart-sessions" aria-label="Oturum grafiği"></canvas>
+              </div>
+            </article>
+
+            <article class="card card--soft">
+              <header class="card__header">
+                <p class="card__title">Ziyaretçi ve sayfa görüntülenme</p>
+              </header>
+              <div class="dashboard-charts__row">
+                <div>
+                  <p class="u-text-muted" style="font-size: 0.8rem; margin-bottom: 0.4rem">
+                    Ziyaretçi
+                  </p>
+                  <div class="card__chart card__chart--sm">
+                    <canvas id="chart-visitors" aria-label="Ziyaretçi grafiği"></canvas>
+                  </div>
+                </div>
+                <div>
+                  <p class="u-text-muted" style="font-size: 0.8rem; margin-bottom: 0.4rem">
+                    Sayfa görüntülenme
+                  </p>
+                  <div class="card__chart card__chart--sm">
+                    <canvas
+                      id="chart-pageviews"
+                      aria-label="Sayfa görüntülenme grafiği"
+                    ></canvas>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <section
+            class="dashboard-charts"
+            aria-label="Yeni / geri dönen ziyaretçi ve cihaz dağılımı"
+          >
+            <article class="card">
+              <header class="card__header">
+                <p class="card__title">Yeni vs Geri Dönen</p>
+                <span class="u-badge u-badge--warning">Davranış</span>
+              </header>
+              <div class="card__chart">
+                <canvas
+                  id="chart-new-vs-returning"
+                  aria-label="Yeni ve geri dönen ziyaretçi grafiği"
+                ></canvas>
+              </div>
+            </article>
+
+            <article class="card">
+              <header class="card__header">
+                <p class="card__title">Cihaz dağılımı</p>
+                <span class="u-badge u-badge--success">Gerçek zamanlı</span>
+              </header>
+              <div class="card__chart">
+                <canvas
+                  id="chart-devices"
+                  aria-label="Cihazlara göre dağılım grafiği"
+                ></canvas>
+              </div>
+            </article>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script src="wwwroot/js/script.js"></script>
+  </body>
+</html>
+

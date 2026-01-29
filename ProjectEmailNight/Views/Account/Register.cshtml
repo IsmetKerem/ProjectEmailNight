@@ -1,0 +1,184 @@
+@model ProjectEmailNight.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Kayıt Ol";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="auth-layout">
+    <section class="auth-layout__panel">
+        <article class="auth-layout__card" aria-labelledby="register-title">
+            <header class="auth-layout__logo">
+                <div class="auth-layout__logo-icon">
+                    <i class="fa-solid fa-envelope-circle-check"></i>
+                </div>
+                <div>
+                    <div class="auth-layout__logo-text">EmailNight</div>
+                    <div class="u-text-muted" style="font-size: 0.8rem">
+                        Takımınız için akıllı email yönetimi
+                    </div>
+                </div>
+            </header>
+
+            <main>
+                <h1 id="register-title" class="auth-layout__title">
+                    Hesabını birkaç adımda oluştur
+                </h1>
+                <p class="auth-layout__subtitle">
+                    Kişisel veya ekip hesabı ile toplu mailleri, kampanyaları ve destek
+                    kutunuzu tek yerden yönetin.
+                </p>
+
+                <!-- Hata Mesajları -->
+                <div asp-validation-summary="ModelOnly" class="auth-form__error-box"></div>
+
+                <form asp-action="Register" asp-controller="Account" method="post" class="auth-form" novalidate>
+                    
+                    <!-- Ad -->
+                    <div class="auth-form__group">
+                        <label class="auth-form__label" asp-for="Name">
+                            <span>Ad</span>
+                        </label>
+                        <div class="auth-form__control">
+                            <span class="auth-form__icon">
+                                <i class="fa-solid fa-user"></i>
+                            </span>
+                            <input asp-for="Name"
+                                   class="auth-form__input"
+                                   type="text"
+                                   autocomplete="given-name"
+                                   placeholder="Adınız" />
+                        </div>
+                        <span asp-validation-for="Name" class="auth-form__error"></span>
+                    </div>
+
+                    <!-- Soyad -->
+                    <div class="auth-form__group">
+                        <label class="auth-form__label" asp-for="Surname">
+                            <span>Soyad</span>
+                        </label>
+                        <div class="auth-form__control">
+                            <span class="auth-form__icon">
+                                <i class="fa-solid fa-user"></i>
+                            </span>
+                            <input asp-for="Surname"
+                                   class="auth-form__input"
+                                   type="text"
+                                   autocomplete="family-name"
+                                   placeholder="Soyadınız" />
+                        </div>
+                        <span asp-validation-for="Surname" class="auth-form__error"></span>
+                    </div>
+
+                    <!-- Kullanıcı Adı -->
+                    <div class="auth-form__group">
+                        <label class="auth-form__label" asp-for="UserName">
+                            <span>Kullanıcı Adı</span>
+                        </label>
+                        <div class="auth-form__control">
+                            <span class="auth-form__icon">
+                                <i class="fa-solid fa-at"></i>
+                            </span>
+                            <input asp-for="UserName"
+                                   class="auth-form__input"
+                                   type="text"
+                                   autocomplete="username"
+                                   placeholder="kullaniciadi" />
+                        </div>
+                        <span asp-validation-for="UserName" class="auth-form__error"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="auth-form__group">
+                        <label class="auth-form__label" asp-for="Email">
+                            <span>İş e-postası</span>
+                        </label>
+                        <div class="auth-form__control">
+                            <span class="auth-form__icon">
+                                <i class="fa-solid fa-envelope"></i>
+                            </span>
+                            <input asp-for="Email"
+                                   class="auth-form__input"
+                                   type="email"
+                                   autocomplete="email"
+                                   placeholder="ornek@firma.com" />
+                        </div>
+                        <span asp-validation-for="Email" class="auth-form__error"></span>
+                    </div>
+
+                    <!-- Şifre -->
+                    <div class="auth-form__group">
+                        <label class="auth-form__label" asp-for="Password">
+                            <span>Şifre</span>
+                        </label>
+                        <div class="auth-form__control">
+                            <span class="auth-form__icon">
+                                <i class="fa-solid fa-lock"></i>
+                            </span>
+                            <input asp-for="Password"
+                                   class="auth-form__input"
+                                   type="password"
+                                   autocomplete="new-password"
+                                   placeholder="En az 6 karakter" />
+                            <button type="button"
+                                    aria-label="Şifreyi göster"
+                                    class="auth-form__toggle fa-solid fa-eye"
+                                    data-password-toggle="#Password"></button>
+                        </div>
+                        <span asp-validation-for="Password" class="auth-form__error"></span>
+                    </div>
+
+                    <!-- Şifre Tekrar -->
+                    <div class="auth-form__group">
+                        <label class="auth-form__label" asp-for="ConfirmPassword">
+                            <span>Şifre tekrar</span>
+                        </label>
+                        <div class="auth-form__control">
+                            <span class="auth-form__icon">
+                                <i class="fa-solid fa-lock"></i>
+                            </span>
+                            <input asp-for="ConfirmPassword"
+                                   class="auth-form__input"
+                                   type="password"
+                                   autocomplete="new-password"
+                                   placeholder="Şifreni tekrar yaz" />
+                            <button type="button"
+                                    aria-label="Şifreyi göster"
+                                    class="auth-form__toggle fa-solid fa-eye"
+                                    data-password-toggle="#ConfirmPassword"></button>
+                        </div>
+                        <span asp-validation-for="ConfirmPassword" class="auth-form__error"></span>
+                    </div>
+
+                    <!-- Kullanım Şartları -->
+                    <div class="auth-form__meta">
+                        <label class="auth-form__checkbox">
+                            <input asp-for="AcceptTerms" type="checkbox" />
+                            <span>
+                                <span class="u-text-muted">Kullanım şartlarını kabul ediyorum</span>
+                            </span>
+                        </label>
+                    </div>
+                    <span asp-validation-for="AcceptTerms" class="auth-form__error"></span>
+
+                    <div class="auth-form__actions">
+                        <button type="submit" class="btn btn--primary">
+                            <span>Hesap oluştur</span>
+                            <i class="fa-solid fa-user-plus"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <footer class="auth-layout__footer">
+                    <p>
+                        Zaten hesabın var mı?
+                        <a asp-action="Login" asp-controller="Account">Giriş yap</a>
+                    </p>
+                </footer>
+            </main>
+        </article>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

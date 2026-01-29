@@ -1,0 +1,379 @@
+@model ProjectEmailNight.Models.EmailListViewModel
+@{
+    ViewData["Title"] = ViewData["Title"] ?? "Gelen Kutusu";
+    ViewData["PageTitle"] = ViewData["PageTitle"] ?? "Gelen Kutusu";
+}
+
+<section class="inbox-layout" aria-label="Gelen kutusu düzeni">
+    <!-- Sol Sidebar -->
+    <aside class="inbox-sidebar">
+        <div class="inbox-sidebar__compose">
+            <a asp-controller="Email" asp-action="Compose" class="btn btn--compose">
+                <i class="fa-solid fa-pen"></i>
+                <span>Yeni mail</span>
+            </a>
+        </div>
+
+        <div>
+            <p class="sidebar__section-title">Klasörler</p>
+            <ul class="inbox-sidebar__folder-list">
+                <li class="inbox-sidebar__item">
+                    <a asp-controller="Email" asp-action="Inbox" 
+                       class="inbox-sidebar__link @(Model.CurrentFolder == "inbox" ? "inbox-sidebar__link--active" : "")">
+                        <span class="inbox-sidebar__link-left">
+                            <span class="inbox-sidebar__link-icon">
+                                <i class="fa-solid fa-inbox"></i>
+                            </span>
+                            <span>Tüm mailler</span>
+                        </span>
+                        <span class="inbox-sidebar__badge">@ViewBag.TotalInbox</span>
+                    </a>
+                </li>
+                <li class="inbox-sidebar__item">
+                    <a asp-controller="Email" asp-action="Starred"
+                       class="inbox-sidebar__link @(Model.CurrentFolder == "starred" ? "inbox-sidebar__link--active" : "")">
+                        <span class="inbox-sidebar__link-left">
+                            <span class="inbox-sidebar__link-icon">
+                                <i class="fa-solid fa-star"></i>
+                            </span>
+                            <span>Yıldızlı</span>
+                        </span>
+                        <span class="inbox-sidebar__badge">@Model.StarredCount</span>
+                    </a>
+                </li>
+                <li class="inbox-sidebar__item">
+                    <a asp-controller="Email" asp-action="Sent"
+                       class="inbox-sidebar__link @(Model.CurrentFolder == "sent" ? "inbox-sidebar__link--active" : "")">
+                        <span class="inbox-sidebar__link-left">
+                            <span class="inbox-sidebar__link-icon">
+                                <i class="fa-regular fa-paper-plane"></i>
+                            </span>
+                            <span>Gönderilmiş</span>
+                        </span>
+                    </a>
+                </li>
+                <li class="inbox-sidebar__item">
+                    <a asp-controller="Email" asp-action="Drafts"
+                       class="inbox-sidebar__link @(Model.CurrentFolder == "drafts" ? "inbox-sidebar__link--active" : "")">
+                        <span class="inbox-sidebar__link-left">
+                            <span class="inbox-sidebar__link-icon">
+                                <i class="fa-regular fa-file-lines"></i>
+                            </span>
+                            <span>Taslaklar</span>
+                        </span>
+                        @if(Model.DraftCount > 0)
+                        {
+                            <span class="inbox-sidebar__badge">@Model.DraftCount</span>
+                        }
+                    </a>
+                </li>
+                <li class="inbox-sidebar__item">
+                    <a asp-controller="Email" asp-action="Trash" class="inbox-sidebar__link">
+                        <span class="inbox-sidebar__link-left">
+                            <span class="inbox-sidebar__link-icon">
+                                <i class="fa-regular fa-trash-can"></i>
+                            </span>
+                            <span>Silinenler</span>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            <p class="sidebar__section-title">Kategoriler</p>
+            <ul class="inbox-sidebar__label-list">
+                <li class="inbox-sidebar__item">
+                    <a asp-controller="Email" asp-action="Category" asp-route-id="1" 
+                       class="inbox-sidebar__link @(Model.CurrentFolder == "category-1" ? "inbox-sidebar__link--active" : "")">
+                        <span class="inbox-sidebar__link-left">
+                            <span class="inbox-sidebar__label-dot" style="background-color: #4285F4;"></span>
+                            <span>Birincil</span>
+                        </span>
+                    </a>
+                </li>
+                <li class="inbox-sidebar__item">
+                    <a asp-controller="Email" asp-action="Category" asp-route-id="2"
+                       class="inbox-sidebar__link @(Model.CurrentFolder == "category-2" ? "inbox-sidebar__link--active" : "")">
+                        <span class="inbox-sidebar__link-left">
+                            <span class="inbox-sidebar__label-dot" style="background-color: #34A853;"></span>
+                            <span>Sosyal</span>
+                        </span>
+                    </a>
+                </li>
+                <li class="inbox-sidebar__item">
+                    <a asp-controller="Email" asp-action="Category" asp-route-id="3"
+                       class="inbox-sidebar__link @(Model.CurrentFolder == "category-3" ? "inbox-sidebar__link--active" : "")">
+                        <span class="inbox-sidebar__link-left">
+                            <span class="inbox-sidebar__label-dot" style="background-color: #FBBC05;"></span>
+                            <span>Promosyon</span>
+                        </span>
+                    </a>
+                </li>
+                <li class="inbox-sidebar__item">
+                    <a asp-controller="Email" asp-action="Category" asp-route-id="4"
+                       class="inbox-sidebar__link @(Model.CurrentFolder == "category-4" ? "inbox-sidebar__link--active" : "")">
+                        <span class="inbox-sidebar__link-left">
+                            <span class="inbox-sidebar__label-dot" style="background-color: #EA4335;"></span>
+                            <span>İş</span>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Mail Listesi -->
+    <section class="inbox-main" aria-label="Mail listesi">
+        
+        @* Arama sonucu banner'ı *@
+        @if(Model.CurrentFolder == "search" && ViewBag.SearchQuery != null)
+        {
+            <div style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(236, 72, 153, 0.1)); padding: 0.75rem 1rem; border-bottom: 1px solid #1f2937; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <i class="fa-solid fa-magnifying-glass" style="color: #a78bfa; margin-right: 0.5rem;"></i>
+                    <span>"<strong>@ViewBag.SearchQuery</strong>" için @Model.TotalCount sonuç bulundu</span>
+                </div>
+                <a asp-controller="Email" asp-action="Inbox" class="btn btn--secondary btn--sm">
+                    <i class="fa-solid fa-xmark"></i>
+                    <span>Aramayı Temizle</span>
+                </a>
+            </div>
+        }
+
+        <header class="inbox-main__toolbar">
+            <div class="inbox-main__toolbar-left">
+                <input type="checkbox" class="inbox-main__checkbox" aria-label="Tüm mailleri seç" id="selectAll">
+                <button class="btn btn--ghost" type="button" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+                <button class="btn btn--ghost" type="button" id="deleteSelected" title="Seçilenleri sil">
+                    <i class="fa-regular fa-trash-can"></i>
+                </button>
+            </div>
+            <div class="inbox-main__toolbar-right">
+                <span class="u-text-muted" style="font-size: 0.8rem">
+                    @if(Model.TotalCount > 0)
+                    {
+                        @((Model.CurrentPage - 1) * Model.PageSize + 1)<text>–</text>@(Math.Min(Model.CurrentPage * Model.PageSize, Model.TotalCount)) <text>/</text> @Model.TotalCount
+                    }
+                    else
+                    {
+                        <text>0 / 0</text>
+                    }
+                </span>
+                
+                @* Önceki sayfa butonu *@
+                @if(Model.CurrentPage > 1)
+                {
+                    @if(Model.CurrentFolder == "search")
+                    {
+                        <a asp-action="Search" asp-route-q="@ViewBag.SearchQuery" asp-route-page="@(Model.CurrentPage - 1)" class="btn btn--ghost">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    }
+                    else if(Model.CurrentFolder.StartsWith("category-"))
+                    {
+                        var catId = Model.CurrentFolder.Replace("category-", "");
+                        <a asp-action="Category" asp-route-id="@catId" asp-route-page="@(Model.CurrentPage - 1)" class="btn btn--ghost">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-action="@Model.CurrentFolder" asp-route-page="@(Model.CurrentPage - 1)" class="btn btn--ghost">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    }
+                }
+                else
+                {
+                    <button class="btn btn--ghost" disabled>
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                }
+                
+                @* Sonraki sayfa butonu *@
+                @if(Model.CurrentPage < Model.TotalPages)
+                {
+                    @if(Model.CurrentFolder == "search")
+                    {
+                        <a asp-action="Search" asp-route-q="@ViewBag.SearchQuery" asp-route-page="@(Model.CurrentPage + 1)" class="btn btn--ghost">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    }
+                    else if(Model.CurrentFolder.StartsWith("category-"))
+                    {
+                        var catId = Model.CurrentFolder.Replace("category-", "");
+                        <a asp-action="Category" asp-route-id="@catId" asp-route-page="@(Model.CurrentPage + 1)" class="btn btn--ghost">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-action="@Model.CurrentFolder" asp-route-page="@(Model.CurrentPage + 1)" class="btn btn--ghost">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    }
+                }
+                else
+                {
+                    <button class="btn btn--ghost" disabled>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                }
+            </div>
+        </header>
+
+        <div class="inbox-main__table-wrapper">
+            @if(Model.Emails.Any())
+            {
+                <table class="inbox-main__table">
+                    <thead class="inbox-main__thead">
+                        <tr>
+                            <th style="width: 40px"></th>
+                            <th style="width: 40px"></th>
+                            <th>@(Model.CurrentFolder == "sent" ? "Alıcı" : "Gönderen")</th>
+                            <th>Konu</th>
+                            <th>Kategori</th>
+                            <th style="text-align: right">Tarih</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var email in Model.Emails)
+                        {
+                            var rowClass = !email.IsRead ? "inbox-main__row inbox-main__row--unread" : "inbox-main__row";
+                            <tr class="@rowClass" data-email-id="@email.Id" onclick="window.location='@Url.Action("Detail", "Email", new { id = email.Id })'">
+                                <td class="inbox-main__cell" onclick="event.stopPropagation()">
+                                    <input type="checkbox" class="inbox-main__checkbox email-checkbox" data-id="@email.Id">
+                                </td>
+                                <td class="inbox-main__cell" onclick="event.stopPropagation()">
+                                    <button type="button" class="star-btn" data-id="@email.Id" style="background: none; border: none; cursor: pointer;">
+                                        <i class="@(email.IsStarred ? "fa-solid" : "fa-regular") fa-star inbox-main__star @(email.IsStarred ? "inbox-main__star--active" : "")"
+                                           aria-label="@(email.IsStarred ? "Yıldızlı" : "Yıldızsız")"></i>
+                                    </button>
+                                </td>
+                                <td class="inbox-main__cell">
+                                    @if(!email.IsRead)
+                                    {
+                                        <strong>@(Model.CurrentFolder == "sent" ? email.ReceiverName : email.SenderName)</strong>
+                                    }
+                                    else
+                                    {
+                                        @(Model.CurrentFolder == "sent" ? email.ReceiverName : email.SenderName)
+                                    }
+                                </td>
+                                <td class="inbox-main__cell inbox-main__subject">
+                                    @if(!email.IsRead)
+                                    {
+                                        <strong>@email.Subject</strong>
+                                    }
+                                    else
+                                    {
+                                        @email.Subject
+                                    }
+                                    @if(email.HasAttachment)
+                                    {
+                                        <i class="fa-solid fa-paperclip" style="margin-left: 0.5rem; color: #6b7280;"></i>
+                                    }
+                                </td>
+                                <td class="inbox-main__cell">
+                                    @if(!string.IsNullOrEmpty(email.CategoryName))
+                                    {
+                                        var categoryClass = email.CategoryId switch
+                                        {
+                                            1 => "inbox-main__category--primary",
+                                            2 => "inbox-main__category--success",
+                                            3 => "inbox-main__category--warning",
+                                            4 => "inbox-main__category--danger",
+                                            _ => "inbox-main__category--secondary"
+                                        };
+                                        <span class="inbox-main__category @categoryClass">
+                                            @email.CategoryName
+                                        </span>
+                                    }
+                                </td>
+                                <td class="inbox-main__cell" style="text-align: right">
+                                    @{
+                                        var now = DateTime.UtcNow;
+                                        var diff = now - email.CreatedAt;
+                                        string dateText;
+                                        
+                                        if (diff.TotalMinutes < 1)
+                                            dateText = "Şimdi";
+                                        else if (diff.TotalHours < 1)
+                                            dateText = $"{(int)diff.TotalMinutes} dk önce";
+                                        else if (email.CreatedAt.Date == now.Date)
+                                            dateText = email.CreatedAt.ToString("HH:mm");
+                                        else if (email.CreatedAt.Date == now.Date.AddDays(-1))
+                                            dateText = "Dün";
+                                        else if (diff.TotalDays < 7)
+                                            dateText = email.CreatedAt.ToString("dddd", new System.Globalization.CultureInfo("tr-TR"));
+                                        else
+                                            dateText = email.CreatedAt.ToString("dd MMM");
+                                    }
+                                    @dateText
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div style="text-align: center; padding: 4rem 2rem; color: #6b7280;">
+                    @if(Model.CurrentFolder == "search")
+                    {
+                        <i class="fa-solid fa-magnifying-glass" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p style="font-size: 1.1rem;">Aramanızla eşleşen e-posta bulunamadı</p>
+                        <p class="u-text-muted">Farklı anahtar kelimeler deneyin</p>
+                    }
+                    else
+                    {
+                        <i class="fa-solid fa-inbox" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p style="font-size: 1.1rem;">Bu klasörde e-posta yok</p>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+</section>
+
+@section Scripts {
+    <script>
+        // Yıldız toggle
+        document.querySelectorAll('.star-btn').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const id = this.dataset.id;
+                const icon = this.querySelector('i');
+                
+                try {
+                    const response = await fetch('@Url.Action("ToggleStar", "Email")', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `id=${id}`
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        icon.classList.toggle('fa-solid');
+                        icon.classList.toggle('fa-regular');
+                        icon.classList.toggle('inbox-main__star--active');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+
+        // Tümünü seç
+        document.getElementById('selectAll')?.addEventListener('change', function() {
+            document.querySelectorAll('.email-checkbox').forEach(cb => {
+                cb.checked = this.checked;
+            });
+        });
+    </script>
+}
