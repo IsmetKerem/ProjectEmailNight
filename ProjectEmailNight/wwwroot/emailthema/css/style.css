@@ -1394,3 +1394,256 @@ button {
 .email-detail__timeline-item span:first-child {
   color: #e5e7eb;
 }
+/* ==========================================================================
+   Toast Notifications
+   ========================================================================== */
+
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 400px;
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid #1f2937;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  transform: translateX(120%);
+  transition: transform 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.toast--show {
+  transform: translateX(0);
+}
+
+.toast--email {
+  border-left: 3px solid #7c3aed;
+}
+
+.toast--success {
+  border-left: 3px solid #10b981;
+}
+
+.toast--error {
+  border-left: 3px solid #ef4444;
+}
+
+.toast--info {
+  border-left: 3px solid #3b82f6;
+}
+
+.toast__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.toast--email .toast__icon {
+  background: rgba(124, 58, 237, 0.2);
+  color: #a78bfa;
+}
+
+.toast--success .toast__icon {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.toast--error .toast__icon {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.toast--info .toast__icon {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+
+.toast__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast__title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #f9fafb;
+  margin-bottom: 0.25rem;
+}
+
+.toast__message {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.toast__close {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+}
+
+.toast__close:hover {
+  color: #f9fafb;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
+   Notification Dropdown
+   ========================================================================== */
+
+.notification-dropdown {
+  position: relative;
+}
+
+.notification-dropdown__menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: 360px;
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid #1f2937;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.notification-dropdown__menu--show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.notification-dropdown__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #1f2937;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.notification-dropdown__clear {
+  background: none;
+  border: none;
+  color: #7c3aed;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.notification-dropdown__clear:hover {
+  text-decoration: underline;
+}
+
+.notification-dropdown__list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-dropdown__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #6b7280;
+  gap: 0.5rem;
+}
+
+.notification-dropdown__empty i {
+  font-size: 2rem;
+  opacity: 0.5;
+}
+
+.notification-dropdown__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #1f2937;
+  transition: background-color 0.2s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.notification-dropdown__item:hover {
+  background: rgba(124, 58, 237, 0.1);
+}
+
+.notification-dropdown__item:last-child {
+  border-bottom: none;
+}
+
+.notification-dropdown__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.notification-dropdown__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-dropdown__sender {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #f9fafb;
+}
+
+.notification-dropdown__subject {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notification-dropdown__time {
+  font-size: 0.7rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.notification-dropdown__category {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+  align-self: flex-start;
+}

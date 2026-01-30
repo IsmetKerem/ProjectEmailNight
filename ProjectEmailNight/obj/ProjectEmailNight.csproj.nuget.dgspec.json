@@ -51,6 +51,10 @@
               "target": "Package",
               "version": "[8.0.23, )"
             },
+            "Microsoft.AspNetCore.SignalR": {
+              "target": "Package",
+              "version": "[1.2.9, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.23, )"

@@ -58,10 +58,9 @@
                                 <i class="fa-solid fa-inbox"></i>
                             </span>
                             <span>Gelen Kutusu</span>
-                            @if(ViewBag.UnreadCount != null && ViewBag.UnreadCount > 0)
-                            {
-                                <span class="sidebar__link-badge">@ViewBag.UnreadCount</span>
-                            }
+                            <span class="sidebar__link-badge" id="sidebar-unread-badge">
+                                @(ViewBag.UnreadCount ?? 0)
+                            </span>
                         </a>
                     </li>
                     <li class="sidebar__item">
@@ -140,6 +139,18 @@
 
                 <p class="sidebar__section-title">Hesap</p>
                 <ul class="sidebar__nav">
+                    @if(User.IsInRole("Admin"))
+                    {
+                        <li class="sidebar__item">
+                            <a class="sidebar__link @(currentController == "Admin" ? "sidebar__link--active" : "")" 
+                               asp-controller="Admin" asp-action="Index">
+                                <span class="sidebar__link-icon" style="color: #ef4444;">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                </span>
+                                <span>Admin Panel</span>
+                            </a>
+                        </li>
+                    }
                     <li class="sidebar__item">
                         <a class="sidebar__link @(currentController == "Profile" ? "sidebar__link--active" : "")" 
                            asp-controller="Profile" asp-action="Index">
@@ -149,7 +160,14 @@
                             <span>Profil</span>
                         </a>
                     </li>
-                    
+                    <li class="sidebar__item">
+                        <a class="sidebar__link" asp-controller="Profile" asp-action="Settings">
+                            <span class="sidebar__link-icon">
+                                <i class="fa-solid fa-gear"></i>
+                            </span>
+                            <span>Ayarlar</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
 
@@ -186,10 +204,28 @@
                 </div>
 
                 <div class="topbar__right">
-                    <button class="topbar__icon-btn topbar__icon-btn--badge" type="button" aria-label="Bildirimler">
-                        <span class="topbar__icon-badge"></span>
-                        <i class="fa-regular fa-bell"></i>
-                    </button>
+                    <!-- Bildirim Butonu -->
+                    <div class="notification-dropdown">
+                        <button class="topbar__icon-btn topbar__icon-btn--badge" type="button" id="notification-btn" aria-label="Bildirimler">
+                            <span class="topbar__icon-badge" id="notification-badge" style="display: none;"></span>
+                            <i class="fa-regular fa-bell"></i>
+                        </button>
+                        <div class="notification-dropdown__menu" id="notification-menu">
+                            <div class="notification-dropdown__header">
+                                <span>Bildirimler</span>
+                                <button type="button" class="notification-dropdown__clear" onclick="clearAllNotifications()">
+                                    Tümünü temizle
+                                </button>
+                            </div>
+                            <div class="notification-dropdown__list" id="notification-list">
+                                <div class="notification-dropdown__empty">
+                                    <i class="fa-regular fa-bell-slash"></i>
+                                    <span>Bildirim yok</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <button class="topbar__icon-btn" type="button" aria-label="Tema değiştir">
                         <i class="fa-regular fa-moon"></i>
                     </button>
@@ -211,7 +247,214 @@
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- SignalR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    
     <script src="~/emailthema/js/script.js"></script>
+    
+    <!-- SignalR Notification Script -->
+    <script>
+        // SignalR bağlantısı
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/notificationHub")
+            .withAutomaticReconnect()
+            .build();
+
+        // Bildirim listesi
+        let notifications = [];
+
+        // Bağlantıyı başlat
+        async function startConnection() {
+            try {
+                await connection.start();
+                console.log("SignalR Connected!");
+            } catch (err) {
+                console.error("SignalR Connection Error:", err);
+                setTimeout(startConnection, 5000);
+            }
+        }
+
+        // Yeni e-posta bildirimi
+        connection.on("ReceiveEmailNotification", function(notification) {
+            console.log("New email notification:", notification);
+            
+            // Toast göster
+            showToast(
+                `📧 ${notification.senderName}`,
+                notification.aiSummary || notification.subject,
+                'email',
+                notification.emailId
+            );
+            
+            // Bildirim listesine ekle
+            addNotificationToList(notification);
+            
+            // Ses çal
+            playNotificationSound();
+        });
+
+        // Okunmamış sayısı güncelleme
+        connection.on("UpdateUnreadCount", function(count) {
+            console.log("Unread count updated:", count);
+            updateUnreadBadge(count);
+        });
+
+        // Genel toast bildirimi
+        connection.on("ReceiveToast", function(data) {
+            showToast(data.title, data.message, data.type);
+        });
+
+        // Toast göster
+        function showToast(title, message, type = 'info', emailId = null) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast--${type}`;
+            
+            const icon = type === 'email' ? 'fa-envelope' : 
+                         type === 'success' ? 'fa-check-circle' :
+                         type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+            
+            toast.innerHTML = `
+                <div class="toast__icon">
+                    <i class="fa-solid ${icon}"></i>
+                </div>
+                <div class="toast__content">
+                    <div class="toast__title">${title}</div>
+                    <div class="toast__message">${message}</div>
+                </div>
+                <button class="toast__close" onclick="this.parentElement.remove()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
+            
+            if (emailId) {
+                toast.style.cursor = 'pointer';
+                toast.onclick = function(e) {
+                    if (!e.target.closest('.toast__close')) {
+                        window.location.href = '/Email/Detail/' + emailId;
+                    }
+                };
+            }
+            
+            container.appendChild(toast);
+            
+            // Animasyon için
+            setTimeout(() => toast.classList.add('toast--show'), 10);
+            
+            // 5 saniye sonra kaldır
+            setTimeout(() => {
+                toast.classList.remove('toast--show');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        // Bildirim listesine ekle
+        function addNotificationToList(notification) {
+            notifications.unshift(notification);
+            if (notifications.length > 10) notifications.pop();
+            
+            renderNotificationList();
+            updateNotificationBadge();
+        }
+
+        // Bildirim listesini render et
+        function renderNotificationList() {
+            const list = document.getElementById('notification-list');
+            
+            if (notifications.length === 0) {
+                list.innerHTML = `
+                    <div class="notification-dropdown__empty">
+                        <i class="fa-regular fa-bell-slash"></i>
+                        <span>Bildirim yok</span>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = notifications.map(n => `
+                <a href="/Email/Detail/${n.emailId}" class="notification-dropdown__item">
+                    <div class="notification-dropdown__avatar">${n.senderInitials}</div>
+                    <div class="notification-dropdown__content">
+                        <div class="notification-dropdown__sender">${n.senderName}</div>
+                        <div class="notification-dropdown__subject">${n.subject}</div>
+                        <div class="notification-dropdown__time">${formatTime(n.createdAt)}</div>
+                    </div>
+                    <div class="notification-dropdown__category" style="background: ${n.categoryColor}20; color: ${n.categoryColor}">
+                        ${n.categoryName}
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        // Zaman formatla
+        function formatTime(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = (now - date) / 1000;
+            
+            if (diff < 60) return 'Şimdi';
+            if (diff < 3600) return Math.floor(diff / 60) + ' dk önce';
+            if (diff < 86400) return Math.floor(diff / 3600) + ' saat önce';
+            return date.toLocaleDateString('tr-TR');
+        }
+
+        // Bildirim badge'ini güncelle
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notification-badge');
+            if (notifications.length > 0) {
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Sidebar unread badge'ini güncelle
+        function updateUnreadBadge(count) {
+            const badge = document.getElementById('sidebar-unread-badge');
+            if (badge) {
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'inline-flex' : 'none';
+            }
+        }
+
+        // Tüm bildirimleri temizle
+        function clearAllNotifications() {
+            notifications = [];
+            renderNotificationList();
+            updateNotificationBadge();
+        }
+
+        // Bildirim sesi çal
+        function playNotificationSound() {
+            try {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleF8NQ6/n2n5pKCZRufDihmQ3OjKR7OeCaUA0M5vy7YZlPDYzkubthmU8NjOS5u2GZTw2M5Lm7YZlPDYzkubthmU8Ng==');
+                audio.volume = 0.3;
+                audio.play();
+            } catch (e) {
+                console.log('Could not play notification sound');
+            }
+        }
+
+        // Bildirim dropdown toggle
+        document.getElementById('notification-btn')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('notification-menu').classList.toggle('notification-dropdown__menu--show');
+        });
+
+        // Dışarı tıklayınca kapat
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.notification-dropdown')) {
+                document.getElementById('notification-menu')?.classList.remove('notification-dropdown__menu--show');
+            }
+        });
+
+        // Bağlantıyı başlat
+        startConnection();
+    </script>
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

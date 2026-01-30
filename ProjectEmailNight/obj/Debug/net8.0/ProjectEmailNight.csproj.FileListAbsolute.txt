@@ -172,3 +172,6 @@
 /Users/ismetkerem/RiderProjects/ProjectEmailNight/ProjectEmailNight/bin/Debug/net8.0/System.Text.Encodings.Web.dll
 /Users/ismetkerem/RiderProjects/ProjectEmailNight/ProjectEmailNight/bin/Debug/net8.0/System.Text.Json.dll
 /Users/ismetkerem/RiderProjects/ProjectEmailNight/ProjectEmailNight/bin/Debug/net8.0/runtimes/browser/lib/net8.0/System.Text.Encodings.Web.dll
+/Users/ismetkerem/RiderProjects/ProjectEmailNight/ProjectEmailNight/obj/Debug/net8.0/ProjectEmailNight.sourcelink.json
+/Users/ismetkerem/RiderProjects/ProjectEmailNight/ProjectEmailNight/bin/Debug/net8.0/Newtonsoft.Json.dll
+/Users/ismetkerem/RiderProjects/ProjectEmailNight/ProjectEmailNight/bin/Debug/net8.0/System.Net.WebSockets.WebSocketProtocol.dll

@@ -285,6 +285,10 @@
       "PackagePath": "staticwebassets/lib/jquery/dist/jquery.min.map"
     },
     {
+      "Id": "/Users/ismetkerem/RiderProjects/ProjectEmailNight/ProjectEmailNight/wwwroot/uploads/profiles/eaf5d397-3aa7-46b4-b078-3569c1bd1fce_5dbb0e1f-847a-413f-ae19-18b9cc1d6469.jpeg",
+      "PackagePath": "staticwebassets/uploads/profiles/eaf5d397-3aa7-46b4-b078-3569c1bd1fce_5dbb0e1f-847a-413f-ae19-18b9cc1d6469.jpeg"
+    },
+    {
       "Id": "obj/Debug/net8.0/staticwebassets/msbuild.ProjectEmailNight.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },

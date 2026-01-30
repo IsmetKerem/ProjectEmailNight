@@ -21,7 +21,7 @@ public class AccountController : Controller
     public IActionResult Login(string? returnUrl = null)
     {
         if (User.Identity?.IsAuthenticated == true)
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Dashboard");
 
         ViewData["ReturnUrl"] = returnUrl;
         return View();
@@ -62,7 +62,7 @@ public class AccountController : Controller
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Dashboard");
         }
 
         if (result.IsLockedOut)
@@ -80,7 +80,7 @@ public class AccountController : Controller
     public IActionResult Register()
     {
         if (User.Identity?.IsAuthenticated == true)
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Dashboard");
 
         return View();
     }
@@ -118,8 +118,11 @@ public class AccountController : Controller
 
         if (result.Succeeded)
         {
+            // 🎭 User rolünü ata
+            await _userManager.AddToRoleAsync(user, "User");
+            
             await _signInManager.SignInAsync(user, isPersistent: false);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Dashboard");
         }
 
         foreach (var error in result.Errors)

@@ -1,0 +1,132 @@
+@model ProjectEmailNight.Models.AdminUserListViewModel
+@{
+    ViewData["Title"] = "Kullanıcılar";
+    ViewData["PageTitle"] = "Kullanıcı Yönetimi";
+}
+
+<div class="card">
+    <header class="card__header">
+        <p class="card__title">Tüm Kullanıcılar (@Model.TotalCount)</p>
+    </header>
+
+    <div class="admin-table-wrapper" style="margin-top: 1rem;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Kullanıcı</th>
+                    <th>E-posta</th>
+                    <th>Roller</th>
+                    <th>E-posta Sayısı</th>
+                    <th>Kayıt Tarihi</th>
+                    <th>Son Giriş</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var user in Model.Users)
+                {
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div class="admin-avatar">@user.Initials</div>
+                                <span>@user.FullName</span>
+                            </div>
+                        </td>
+                        <td class="u-text-muted">@user.Email</td>
+                        <td>
+                            @foreach(var role in user.Roles)
+                            {
+                                var badgeClass = role == "Admin" ? "u-badge--danger" : "u-badge--info";
+                                <span class="u-badge @badgeClass">@role</span>
+                            }
+                        </td>
+                        <td>@user.EmailCount</td>
+                        <td class="u-text-muted">@user.CreatedAt.ToString("dd MMM yyyy")</td>
+                        <td class="u-text-muted">
+                            @if(user.LastLoginAt.HasValue)
+                            {
+                                @user.LastLoginAt.Value.ToString("dd MMM HH:mm")
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="UserDetail" asp-route-id="@user.Id" class="btn btn--secondary btn--sm">
+                                <i class="fa-solid fa-eye"></i>
+                                <span>Detay</span>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    @if(Model.TotalPages > 1)
+    {
+        <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1rem;">
+            @if(Model.CurrentPage > 1)
+            {
+                <a asp-action="Users" asp-route-page="@(Model.CurrentPage - 1)" class="btn btn--ghost btn--sm">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+            }
+            <span class="u-text-muted" style="padding: 0.5rem;">
+                Sayfa @Model.CurrentPage / @Model.TotalPages
+            </span>
+            @if(Model.CurrentPage < Model.TotalPages)
+            {
+                <a asp-action="Users" asp-route-page="@(Model.CurrentPage + 1)" class="btn btn--ghost btn--sm">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            }
+        </div>
+    }
+</div>
+
+@section Styles {
+<style>
+    .admin-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #7c3aed, #ec4899);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .admin-table-wrapper {
+        overflow-x: auto;
+    }
+    
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+    }
+    
+    .admin-table th,
+    .admin-table td {
+        padding: 0.6rem 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #1f2937;
+    }
+    
+    .admin-table th {
+        color: #6b7280;
+        font-weight: 500;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+    
+    .admin-table tr:hover {
+        background: rgba(124, 58, 237, 0.05);
+    }
+</style>
+}

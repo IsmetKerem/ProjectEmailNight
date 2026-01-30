@@ -13,17 +13,20 @@ public class EmailService : IEmailService
     private readonly UserManager<AppUser> _userManager;
     private readonly IWebHostEnvironment _environment;
     private readonly IAIService _aiService;
+    private readonly INotificationService _notificationService;
 
     public EmailService(
         EmailContext context, 
         UserManager<AppUser> userManager, 
         IWebHostEnvironment environment,
-        IAIService aiService)
+        IAIService aiService,
+        INotificationService notificationService)
     {
         _context = context;
         _userManager = userManager;
         _environment = environment;
         _aiService = aiService;
+        _notificationService = notificationService;
     }
 
     public async Task<int> SendEmailAsync(string senderId, string receiverEmail, string subject, string htmlBody, List<IFormFile>? attachments = null)
@@ -31,6 +34,10 @@ public class EmailService : IEmailService
         var receiver = await _userManager.FindByEmailAsync(receiverEmail);
         if (receiver == null)
             throw new ArgumentException("Alıcı bulunamadı");
+
+        var sender = await _userManager.FindByIdAsync(senderId);
+        if (sender == null)
+            throw new ArgumentException("Gönderen bulunamadı");
 
         var sanitizedHtml = SanitizeHtml(htmlBody);
 
@@ -52,10 +59,38 @@ public class EmailService : IEmailService
         _context.Emails.Add(email);
         await _context.SaveChangesAsync();
 
+        // Ekleri kaydet
         if (attachments != null && attachments.Any())
         {
             await SaveAttachmentsAsync(email.Id, attachments);
         }
+
+        // 🔔 Gerçek zamanlı bildirim gönder
+        var category = await _context.EmailCategories.FindAsync(analysis.CategoryId);
+        
+        var notification = new EmailNotificationDto
+        {
+            EmailId = email.Id,
+            SenderName = $"{sender.Name} {sender.Surname}",
+            SenderEmail = sender.Email ?? "",
+            SenderInitials = $"{sender.Name?[0]}{sender.Surname?[0]}",
+            Subject = subject,
+            Preview = ConvertToPlainText(sanitizedHtml).Length > 100 
+                ? ConvertToPlainText(sanitizedHtml).Substring(0, 100) + "..." 
+                : ConvertToPlainText(sanitizedHtml),
+            AISummary = analysis.Summary,
+            CategoryName = category?.Name ?? "Birincil",
+            CategoryColor = category?.Color ?? "#4285F4",
+            CreatedAt = email.CreatedAt
+        };
+
+        // Alıcıya bildirim gönder
+        await _notificationService.SendEmailNotificationAsync(receiver.Id, notification);
+
+        // Okunmamış sayısını güncelle
+        var unreadCount = await _context.Emails.CountAsync(e => 
+            e.ReceiverId == receiver.Id && !e.IsRead && !e.IsDeleted && !e.ReceiverDeleted && !e.IsDraft);
+        await _notificationService.SendUnreadCountUpdateAsync(receiver.Id, unreadCount);
 
         return email.Id;
     }

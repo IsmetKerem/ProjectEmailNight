@@ -1,0 +1,176 @@
+@model ProjectEmailNight.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Panel";
+    ViewData["PageTitle"] = "Admin Dashboard";
+}
+
+<div class="admin-dashboard">
+    <!-- İstatistik Kartları -->
+    <div class="dashboard-grid">
+        <div class="card">
+            <div class="card__header">
+                <p class="card__title">Toplam Kullanıcı</p>
+                <i class="fa-solid fa-users" style="color: #7c3aed;"></i>
+            </div>
+            <p class="card__value">@Model.TotalUsers</p>
+            <p class="card__meta">Kayıtlı kullanıcı sayısı</p>
+        </div>
+
+        <div class="card">
+            <div class="card__header">
+                <p class="card__title">Toplam E-posta</p>
+                <i class="fa-solid fa-envelope" style="color: #3b82f6;"></i>
+            </div>
+            <p class="card__value">@Model.TotalEmails</p>
+            <p class="card__meta">Sistemdeki tüm e-postalar</p>
+        </div>
+
+        <div class="card">
+            <div class="card__header">
+                <p class="card__title">Bugünkü E-posta</p>
+                <i class="fa-solid fa-paper-plane" style="color: #10b981;"></i>
+            </div>
+            <p class="card__value">@Model.TotalEmailsToday</p>
+            <p class="card__meta">Bugün gönderilen</p>
+        </div>
+
+        <div class="card">
+            <div class="card__header">
+                <p class="card__title">Aktif Kullanıcı</p>
+                <i class="fa-solid fa-user-check" style="color: #f59e0b;"></i>
+            </div>
+            <p class="card__value">@Model.ActiveUsersToday</p>
+            <p class="card__meta">Bugün aktif olan</p>
+        </div>
+    </div>
+
+    <!-- Hızlı Linkler -->
+    <div class="admin-quick-links" style="margin: 1.5rem 0; display: flex; gap: 0.75rem;">
+        <a asp-action="Users" class="btn btn--primary">
+            <i class="fa-solid fa-users"></i>
+            <span>Kullanıcıları Yönet</span>
+        </a>
+        <a asp-action="Emails" class="btn btn--secondary">
+            <i class="fa-solid fa-envelope"></i>
+            <span>E-postaları Görüntüle</span>
+        </a>
+        <a asp-action="Statistics" class="btn btn--secondary">
+            <i class="fa-solid fa-chart-bar"></i>
+            <span>İstatistikler</span>
+        </a>
+    </div>
+
+    <div class="dashboard-charts">
+        <!-- Son Kullanıcılar -->
+        <div class="card">
+            <header class="card__header">
+                <p class="card__title">Son Kayıt Olan Kullanıcılar</p>
+                <a asp-action="Users" class="btn btn--ghost btn--sm">Tümünü Gör</a>
+            </header>
+            <div class="admin-table-wrapper">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Kullanıcı</th>
+                            <th>E-posta</th>
+                            <th>Kayıt Tarihi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var user in Model.RecentUsers)
+                        {
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div class="admin-avatar">@user.Name[0]@user.Surname[0]</div>
+                                        <span>@user.Name @user.Surname</span>
+                                    </div>
+                                </td>
+                                <td class="u-text-muted">@user.Email</td>
+                                <td class="u-text-muted">@user.CreatedAt.ToString("dd MMM yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Son E-postalar -->
+        <div class="card">
+            <header class="card__header">
+                <p class="card__title">Son E-postalar</p>
+                <a asp-action="Emails" class="btn btn--ghost btn--sm">Tümünü Gör</a>
+            </header>
+            <div class="admin-table-wrapper">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Gönderen</th>
+                            <th>Konu</th>
+                            <th>Tarih</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var email in Model.RecentEmails)
+                        {
+                            <tr>
+                                <td>@email.Sender?.Name @email.Sender?.Surname</td>
+                                <td>
+                                    <span style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block;">
+                                        @email.Subject
+                                    </span>
+                                </td>
+                                <td class="u-text-muted">@email.CreatedAt.ToString("dd MMM HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+<style>
+    .admin-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #7c3aed, #ec4899);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .admin-table-wrapper {
+        overflow-x: auto;
+        margin-top: 0.75rem;
+    }
+    
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+    }
+    
+    .admin-table th,
+    .admin-table td {
+        padding: 0.6rem 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #1f2937;
+    }
+    
+    .admin-table th {
+        color: #6b7280;
+        font-weight: 500;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+    
+    .admin-table tr:hover {
+        background: rgba(124, 58, 237, 0.05);
+    }
+</style>
+}
