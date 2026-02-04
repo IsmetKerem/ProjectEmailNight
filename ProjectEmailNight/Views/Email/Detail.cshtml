@@ -10,16 +10,29 @@
         dateText = $"Dün • {Model.CreatedAt:HH:mm}";
     else
         dateText = Model.CreatedAt.ToString("dd MMM yyyy • HH:mm");
+    
+    var isInTrash = ViewBag.IsInTrash == true;
+    var fromFolder = ViewBag.FromFolder as string ?? "Inbox";
 }
 
 <section class="email-detail" aria-label="Mail detay düzeni">
     <article class="card">
         <header class="email-detail__header">
             <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-                <a asp-controller="Email" asp-action="Inbox" class="btn btn--secondary btn--sm">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>Geri</span>
-                </a>
+                @if(isInTrash)
+                {
+                    <a asp-controller="Email" asp-action="Trash" class="btn btn--secondary btn--sm">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Geri</span>
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Email" asp-action="Inbox" class="btn btn--secondary btn--sm">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Geri</span>
+                    </a>
+                }
                 <h2 class="email-detail__subject">
                     @if(Model.IsStarred)
                     {
@@ -31,6 +44,12 @@
                 {
                     <span class="u-badge" style="background: @(Model.CategoryColor)20; color: @Model.CategoryColor;">
                         @Model.CategoryName
+                    </span>
+                }
+                @if(isInTrash)
+                {
+                    <span class="u-badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">
+                        <i class="fa-solid fa-trash-can" style="margin-right: 0.25rem;"></i> Çöp Kutusunda
                     </span>
                 }
             </div>
@@ -49,51 +68,71 @@
                 <div style="text-align: right">
                     <div class="u-text-muted">@dateText</div>
                     <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; justify-content: flex-end;">
-                        @if(!Model.IsMine)
+                        @if(isInTrash)
                         {
-                            <a asp-controller="Email" asp-action="Compose" asp-route-replyTo="@Model.Id" class="btn btn--secondary btn--sm">
-                                <i class="fa-solid fa-reply"></i>
-                                <span>Yanıtla</span>
-                            </a>
-                        }
-                        <button type="button" class="btn btn--secondary btn--sm star-btn" data-id="@Model.Id">
-                            <i class="@(Model.IsStarred ? "fa-solid" : "fa-regular") fa-star"></i>
-                            <span>@(Model.IsStarred ? "Yıldızı Kaldır" : "Yıldızla")</span>
-                        </button>
-                        <form asp-action="Delete" method="post" style="display: inline;" onsubmit="return confirm('Silmek istediğinize emin misiniz?')">
-                            <input type="hidden" name="id" value="@Model.Id" />
-                            <button type="submit" class="btn btn--secondary btn--sm">
-                                <i class="fa-regular fa-trash-can"></i>
-                                <span>Sil</span>
+                            <button type="button" class="btn btn--secondary btn--sm" onclick="restoreEmail(@Model.Id)">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                <span>Geri Yükle</span>
                             </button>
-                        </form>
+                            <button type="button" class="btn btn--danger btn--sm" onclick="permanentDelete(@Model.Id)">
+                                <i class="fa-solid fa-trash"></i>
+                                <span>Kalıcı Sil</span>
+                            </button>
+                        }
+                        else
+                        {
+                            @if(!Model.IsMine)
+                            {
+                                <a asp-controller="Email" asp-action="Compose" asp-route-replyTo="@Model.Id" class="btn btn--secondary btn--sm">
+                                    <i class="fa-solid fa-reply"></i>
+                                    <span>Yanıtla</span>
+                                </a>
+                            }
+                            <a asp-controller="Email" asp-action="Compose" asp-route-forwardId="@Model.Id" class="btn btn--secondary btn--sm">
+                                <i class="fa-solid fa-share"></i>
+                                <span>İlet</span>
+                            </a>
+                            <button type="button" class="btn btn--secondary btn--sm star-btn" data-id="@Model.Id">
+                                <i class="@(Model.IsStarred ? "fa-solid" : "fa-regular") fa-star"></i>
+                                <span>@(Model.IsStarred ? "Yıldızı Kaldır" : "Yıldızla")</span>
+                            </button>
+                            <form asp-action="Delete" method="post" style="display: inline;" onsubmit="return confirm('E-postayı çöp kutusuna taşımak istediğinize emin misiniz?')">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn btn--secondary btn--sm">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                    <span>Sil</span>
+                                </button>
+                            </form>
+                        }
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- AI Özet Bölümü -->
-        <div class="ai-summary-box" id="ai-summary-box">
-            <div class="ai-summary-header">
-                <div class="ai-summary-title">
-                    <i class="fa-solid fa-robot"></i>
-                    <span>AI Özet</span>
+        @if(!isInTrash)
+        {
+            <div class="ai-summary-box" id="ai-summary-box">
+                <div class="ai-summary-header">
+                    <div class="ai-summary-title">
+                        <i class="fa-solid fa-robot"></i>
+                        <span>AI Özet</span>
+                    </div>
+                    <button type="button" class="ai-summary-refresh" onclick="regenerateAnalysis()" title="Yeniden analiz et">
+                        <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i>
+                    </button>
                 </div>
-                <button type="button" class="ai-summary-refresh" onclick="regenerateAnalysis()" title="Yeniden analiz et">
-                    <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i>
-                </button>
+                <p class="ai-summary-text" id="ai-summary-text">
+                    @if(!string.IsNullOrEmpty(Model.AISummary))
+                    {
+                        @Model.AISummary
+                    }
+                    else
+                    {
+                        <span class="u-text-muted">Özet oluşturuluyor...</span>
+                    }
+                </p>
             </div>
-            <p class="ai-summary-text" id="ai-summary-text">
-                @if(!string.IsNullOrEmpty(Model.AISummary))
-                {
-                    @Model.AISummary
-                }
-                else
-                {
-                    <span class="u-text-muted">Özet oluşturuluyor...</span>
-                }
-            </p>
-        </div>
+        }
 
         <article class="email-detail__body">
             @Html.Raw(Model.Body)
@@ -142,7 +181,7 @@
             }
         </div>
 
-        @if(!Model.IsMine)
+        @if(!Model.IsMine && !isInTrash)
         {
             <header class="card__header" style="margin-top: 1.25rem">
                 <p class="card__title">
@@ -193,17 +232,35 @@
             <p class="card__title">Hızlı Aksiyonlar</p>
         </header>
         <div class="email-detail__quick-actions">
-            @if(!Model.IsMine)
+            @if(isInTrash)
             {
-                <a asp-action="Compose" asp-route-replyTo="@Model.Id" class="btn btn--secondary btn--sm btn--block">
-                    <i class="fa-solid fa-reply"></i>
-                    <span>Yanıtla</span>
+                <button type="button" class="btn btn--secondary btn--sm btn--block" onclick="restoreEmail(@Model.Id)">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Geri Yükle</span>
+                </button>
+                <a asp-action="Trash" class="btn btn--secondary btn--sm btn--block">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Çöp Kutusuna Dön</span>
                 </a>
             }
-            <a asp-action="Inbox" class="btn btn--secondary btn--sm btn--block">
-                <i class="fa-solid fa-inbox"></i>
-                <span>Gelen Kutusuna Dön</span>
-            </a>
+            else
+            {
+                @if(!Model.IsMine)
+                {
+                    <a asp-action="Compose" asp-route-replyTo="@Model.Id" class="btn btn--secondary btn--sm btn--block">
+                        <i class="fa-solid fa-reply"></i>
+                        <span>Yanıtla</span>
+                    </a>
+                }
+                <a asp-action="Compose" asp-route-forwardId="@Model.Id" class="btn btn--secondary btn--sm btn--block">
+                    <i class="fa-solid fa-share"></i>
+                    <span>İlet</span>
+                </a>
+                <a asp-action="Inbox" class="btn btn--secondary btn--sm btn--block">
+                    <i class="fa-solid fa-inbox"></i>
+                    <span>Gelen Kutusuna Dön</span>
+                </a>
+            }
         </div>
     </aside>
 </section>
@@ -223,6 +280,16 @@
     .btn--block {
         width: 100%;
         justify-content: center;
+    }
+    
+    .btn--danger {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: #fff;
+        border: none;
+    }
+    
+    .btn--danger:hover {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
     }
     
     .ai-summary-box {
@@ -368,6 +435,43 @@
             if (result.success) location.reload();
         });
     });
+    
+    // Geri yükle
+    async function restoreEmail(id) {
+        try {
+            const response = await fetch('@Url.Action("RestoreFromTrash")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'id=' + id
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert('E-posta geri yüklendi!');
+                window.location.href = '@Url.Action("Inbox")';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    
+    // Kalıcı sil
+    async function permanentDelete(id) {
+        if (!confirm('Bu e-postayı kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) return;
+        
+        try {
+            const response = await fetch('@Url.Action("PermanentDelete")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'id=' + id
+            });
+            const result = await response.json();
+            if (result.success) {
+                window.location.href = '@Url.Action("Trash")';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
     
     // AI analiz yenileme
     async function regenerateAnalysis() {

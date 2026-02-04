@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = ViewData["Title"] ?? "Gelen Kutusu";
     ViewData["PageTitle"] = ViewData["PageTitle"] ?? "Gelen Kutusu";
+    var isTrash = Model.CurrentFolder == "trash";
 }
 
 <section class="inbox-layout" aria-label="Gelen kutusu düzeni">
@@ -68,13 +69,18 @@
                     </a>
                 </li>
                 <li class="inbox-sidebar__item">
-                    <a asp-controller="Email" asp-action="Trash" class="inbox-sidebar__link">
+                    <a asp-controller="Email" asp-action="Trash" 
+                       class="inbox-sidebar__link @(Model.CurrentFolder == "trash" ? "inbox-sidebar__link--active" : "")">
                         <span class="inbox-sidebar__link-left">
                             <span class="inbox-sidebar__link-icon">
                                 <i class="fa-regular fa-trash-can"></i>
                             </span>
-                            <span>Silinenler</span>
+                            <span>Çöp Kutusu</span>
                         </span>
+                        @if(ViewBag.TrashCount != null && ViewBag.TrashCount > 0)
+                        {
+                            <span class="inbox-sidebar__badge">@ViewBag.TrashCount</span>
+                        }
                     </a>
                 </li>
             </ul>
@@ -129,9 +135,9 @@
         @* Arama sonucu banner'ı *@
         @if(Model.CurrentFolder == "search" && ViewBag.SearchQuery != null)
         {
-            <div style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(236, 72, 153, 0.1)); padding: 0.75rem 1rem; border-bottom: 1px solid #1f2937; display: flex; justify-content: space-between; align-items: center;">
+            <div class="inbox-banner inbox-banner--search">
                 <div>
-                    <i class="fa-solid fa-magnifying-glass" style="color: #a78bfa; margin-right: 0.5rem;"></i>
+                    <i class="fa-solid fa-magnifying-glass"></i>
                     <span>"<strong>@ViewBag.SearchQuery</strong>" için @Model.TotalCount sonuç bulundu</span>
                 </div>
                 <a asp-controller="Email" asp-action="Inbox" class="btn btn--secondary btn--sm">
@@ -141,15 +147,56 @@
             </div>
         }
 
+        @* Çöp kutusu banner'ı *@
+        @if(isTrash)
+        {
+            <div class="inbox-banner inbox-banner--trash">
+                <div>
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Çöp kutusundaki e-postalar <strong>30 gün</strong> sonra otomatik silinir</span>
+                </div>
+                @if(Model.Emails.Any())
+                {
+                    <button type="button" class="btn btn--danger btn--sm" onclick="emptyTrash()">
+                        <i class="fa-solid fa-trash"></i>
+                        <span>Çöp Kutusunu Boşalt</span>
+                    </button>
+                }
+            </div>
+        }
+
         <header class="inbox-main__toolbar">
             <div class="inbox-main__toolbar-left">
                 <input type="checkbox" class="inbox-main__checkbox" aria-label="Tüm mailleri seç" id="selectAll">
-                <button class="btn btn--ghost" type="button" onclick="location.reload()">
+                <button class="btn btn--ghost" type="button" onclick="location.reload()" title="Yenile">
                     <i class="fa-solid fa-rotate-right"></i>
                 </button>
-                <button class="btn btn--ghost" type="button" id="deleteSelected" title="Seçilenleri sil">
-                    <i class="fa-regular fa-trash-can"></i>
-                </button>
+                
+                @* Bulk Actions *@
+                <div class="bulk-actions" id="bulk-actions" style="display: none;">
+                    @if(isTrash)
+                    {
+                        <button class="btn btn--ghost" type="button" onclick="bulkRestore()" title="Geri yükle">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                        <button class="btn btn--ghost btn--ghost-danger" type="button" onclick="bulkPermanentDelete()" title="Kalıcı sil">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn--ghost" type="button" onclick="bulkDelete()" title="Çöp kutusuna taşı">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                        <button class="btn btn--ghost" type="button" onclick="bulkMarkAsRead()" title="Okundu işaretle">
+                            <i class="fa-solid fa-envelope-open"></i>
+                        </button>
+                        <button class="btn btn--ghost" type="button" onclick="bulkStar()" title="Yıldızla">
+                            <i class="fa-regular fa-star"></i>
+                        </button>
+                    }
+                    <span class="bulk-count u-text-muted" id="bulk-count"></span>
+                </div>
             </div>
             <div class="inbox-main__toolbar-right">
                 <span class="u-text-muted" style="font-size: 0.8rem">
@@ -163,12 +210,23 @@
                     }
                 </span>
                 
-                @* Önceki sayfa butonu *@
-                @if(Model.CurrentPage > 1)
+                @* Pagination *@
+                @{
+                    var prevDisabled = Model.CurrentPage <= 1;
+                    var nextDisabled = Model.CurrentPage >= Model.TotalPages;
+                }
+                
+                @if(!prevDisabled)
                 {
                     @if(Model.CurrentFolder == "search")
                     {
                         <a asp-action="Search" asp-route-q="@ViewBag.SearchQuery" asp-route-page="@(Model.CurrentPage - 1)" class="btn btn--ghost">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    }
+                    else if(Model.CurrentFolder == "trash")
+                    {
+                        <a asp-action="Trash" asp-route-page="@(Model.CurrentPage - 1)" class="btn btn--ghost">
                             <i class="fa-solid fa-chevron-left"></i>
                         </a>
                     }
@@ -188,17 +246,20 @@
                 }
                 else
                 {
-                    <button class="btn btn--ghost" disabled>
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </button>
+                    <button class="btn btn--ghost" disabled><i class="fa-solid fa-chevron-left"></i></button>
                 }
                 
-                @* Sonraki sayfa butonu *@
-                @if(Model.CurrentPage < Model.TotalPages)
+                @if(!nextDisabled)
                 {
                     @if(Model.CurrentFolder == "search")
                     {
                         <a asp-action="Search" asp-route-q="@ViewBag.SearchQuery" asp-route-page="@(Model.CurrentPage + 1)" class="btn btn--ghost">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    }
+                    else if(Model.CurrentFolder == "trash")
+                    {
+                        <a asp-action="Trash" asp-route-page="@(Model.CurrentPage + 1)" class="btn btn--ghost">
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
                     }
@@ -218,9 +279,7 @@
                 }
                 else
                 {
-                    <button class="btn btn--ghost" disabled>
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
+                    <button class="btn btn--ghost" disabled><i class="fa-solid fa-chevron-right"></i></button>
                 }
             </div>
         </header>
@@ -243,7 +302,8 @@
                         @foreach(var email in Model.Emails)
                         {
                             var rowClass = !email.IsRead ? "inbox-main__row inbox-main__row--unread" : "inbox-main__row";
-                            <tr class="@rowClass" data-email-id="@email.Id" onclick="window.location='@Url.Action("Detail", "Email", new { id = email.Id })'">
+                            var detailUrl = Url.Action("Detail", "Email", new { id = email.Id, from = Model.CurrentFolder });
+                            <tr class="@rowClass" data-email-id="@email.Id" onclick="window.location='@detailUrl'">
                                 <td class="inbox-main__cell" onclick="event.stopPropagation()">
                                     <input type="checkbox" class="inbox-main__checkbox email-checkbox" data-id="@email.Id">
                                 </td>
@@ -321,17 +381,23 @@
             }
             else
             {
-                <div style="text-align: center; padding: 4rem 2rem; color: #6b7280;">
+                <div class="inbox-empty">
                     @if(Model.CurrentFolder == "search")
                     {
-                        <i class="fa-solid fa-magnifying-glass" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <p style="font-size: 1.1rem;">Aramanızla eşleşen e-posta bulunamadı</p>
-                        <p class="u-text-muted">Farklı anahtar kelimeler deneyin</p>
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <p>Aramanızla eşleşen e-posta bulunamadı</p>
+                        <span class="u-text-muted">Farklı anahtar kelimeler deneyin</span>
+                    }
+                    else if(isTrash)
+                    {
+                        <i class="fa-regular fa-trash-can"></i>
+                        <p>Çöp kutusu boş</p>
+                        <span class="u-text-muted">Silinen e-postalar burada görünür</span>
                     }
                     else
                     {
-                        <i class="fa-solid fa-inbox" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <p style="font-size: 1.1rem;">Bu klasörde e-posta yok</p>
+                        <i class="fa-solid fa-inbox"></i>
+                        <p>Bu klasörde e-posta yok</p>
                     }
                 </div>
             }
@@ -339,41 +405,261 @@
     </section>
 </section>
 
-@section Scripts {
-    <script>
-        // Yıldız toggle
-        document.querySelectorAll('.star-btn').forEach(btn => {
-            btn.addEventListener('click', async function(e) {
-                e.preventDefault();
-                const id = this.dataset.id;
-                const icon = this.querySelector('i');
-                
-                try {
-                    const response = await fetch('@Url.Action("ToggleStar", "Email")', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: `id=${id}`
-                    });
-                    
-                    const result = await response.json();
-                    if (result.success) {
-                        icon.classList.toggle('fa-solid');
-                        icon.classList.toggle('fa-regular');
-                        icon.classList.toggle('inbox-main__star--active');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                }
-            });
-        });
+@section Styles {
+<style>
+    .inbox-banner {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #1f2937;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+    
+    .inbox-banner > div {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .inbox-banner--search {
+        background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(236, 72, 153, 0.1));
+    }
+    
+    .inbox-banner--search i {
+        color: #a78bfa;
+    }
+    
+    .inbox-banner--trash {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1));
+    }
+    
+    .inbox-banner--trash i {
+        color: #ef4444;
+    }
+    
+    .inbox-empty {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #6b7280;
+    }
+    
+    .inbox-empty i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .inbox-empty p {
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .bulk-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-left: 0.5rem;
+        padding-left: 0.5rem;
+        border-left: 1px solid #374151;
+    }
+    
+    .bulk-count {
+        font-size: 0.8rem;
+        margin-left: 0.5rem;
+    }
+    
+    .btn--ghost-danger:hover {
+        color: #ef4444 !important;
+        background-color: rgba(239, 68, 68, 0.1) !important;
+    }
+    
+    .btn--danger {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: #fff;
+        border: none;
+    }
+    
+    .btn--danger:hover {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+    }
+</style>
+}
 
-        // Tümünü seç
-        document.getElementById('selectAll')?.addEventListener('change', function() {
-            document.querySelectorAll('.email-checkbox').forEach(cb => {
-                cb.checked = this.checked;
-            });
+@section Scripts {
+<script>
+    var isTrash = @(isTrash ? "true" : "false");
+    
+    // Yıldız toggle
+    document.querySelectorAll('.star-btn').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const id = this.dataset.id;
+            const icon = this.querySelector('i');
+            
+            try {
+                const response = await fetch('@Url.Action("ToggleStar", "Email")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `id=${id}`
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    icon.classList.toggle('fa-solid');
+                    icon.classList.toggle('fa-regular');
+                    icon.classList.toggle('inbox-main__star--active');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
         });
-    </script>
+    });
+
+    // Seçili ID'leri al
+    function getSelectedIds() {
+        const checkboxes = document.querySelectorAll('.email-checkbox:checked');
+        return Array.from(checkboxes).map(cb => parseInt(cb.dataset.id));
+    }
+
+    // Bulk actions göster/gizle
+    function updateBulkActions() {
+        const selected = getSelectedIds();
+        const bulkActions = document.getElementById('bulk-actions');
+        const bulkCount = document.getElementById('bulk-count');
+        
+        if (selected.length > 0) {
+            bulkActions.style.display = 'flex';
+            bulkCount.textContent = selected.length + ' seçili';
+        } else {
+            bulkActions.style.display = 'none';
+        }
+    }
+
+    // Checkbox değişikliklerini dinle
+    document.querySelectorAll('.email-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateBulkActions);
+    });
+
+    // Tümünü seç
+    document.getElementById('selectAll')?.addEventListener('change', function() {
+        document.querySelectorAll('.email-checkbox').forEach(cb => {
+            cb.checked = this.checked;
+        });
+        updateBulkActions();
+    });
+
+    // Toplu çöpe taşı
+    async function bulkDelete() {
+        const ids = getSelectedIds();
+        if (ids.length === 0) return;
+        
+        if (!confirm(ids.length + ' e-postayı çöp kutusuna taşımak istediğinize emin misiniz?')) return;
+        
+        try {
+            const response = await fetch('@Url.Action("BulkDelete", "Email")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(ids)
+            });
+            const result = await response.json();
+            if (result.success) location.reload();
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    // Toplu okundu yap
+    async function bulkMarkAsRead() {
+        const ids = getSelectedIds();
+        if (ids.length === 0) return;
+        
+        try {
+            const response = await fetch('@Url.Action("BulkMarkAsRead", "Email")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(ids)
+            });
+            const result = await response.json();
+            if (result.success) location.reload();
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    // Toplu yıldızla
+    async function bulkStar() {
+        const ids = getSelectedIds();
+        if (ids.length === 0) return;
+        
+        try {
+            const response = await fetch('@Url.Action("BulkStar", "Email")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(ids)
+            });
+            const result = await response.json();
+            if (result.success) location.reload();
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    // Toplu geri yükle
+    async function bulkRestore() {
+        const ids = getSelectedIds();
+        if (ids.length === 0) return;
+        
+        try {
+            const response = await fetch('@Url.Action("BulkRestore", "Email")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(ids)
+            });
+            const result = await response.json();
+            if (result.success) location.reload();
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    // Toplu kalıcı sil
+    async function bulkPermanentDelete() {
+        const ids = getSelectedIds();
+        if (ids.length === 0) return;
+        
+        if (!confirm(ids.length + ' e-postayı kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) return;
+        
+        try {
+            const response = await fetch('@Url.Action("BulkPermanentDelete", "Email")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(ids)
+            });
+            const result = await response.json();
+            if (result.success) location.reload();
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    // Çöp kutusunu boşalt
+    async function emptyTrash() {
+        if (!confirm('Çöp kutusundaki TÜM e-postalar kalıcı olarak silinecek. Bu işlem geri alınamaz! Emin misiniz?')) return;
+        
+        try {
+            const response = await fetch('@Url.Action("EmptyTrash", "Email")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert(result.count + ' e-posta kalıcı olarak silindi.');
+                location.reload();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+</script>
 }

@@ -226,8 +226,8 @@
                         </div>
                     </div>
                     
-                    <button class="topbar__icon-btn" type="button" aria-label="Tema değiştir">
-                        <i class="fa-regular fa-moon"></i>
+                    <button class="topbar__icon-btn" type="button" aria-label="Tema değiştir" id="theme-toggle" onclick="toggleTheme()">
+                        <i class="fa-regular fa-moon" id="theme-icon"></i>
                     </button>
                     <button class="topbar__profile" type="button">
                         <span class="topbar__avatar">@(ViewBag.CurrentUser?.Name?.Substring(0,1))@(ViewBag.CurrentUser?.Surname?.Substring(0,1))</span>
@@ -454,6 +454,37 @@
         // Bağlantıyı başlat
         startConnection();
     </script>
+    <script>
+    // Tema Yönetimi
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+    }
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    }
+
+    function updateThemeIcon(theme) {
+        const icon = document.getElementById('theme-icon');
+        if (icon) {
+            if (theme === 'light') {
+                icon.className = 'fa-solid fa-sun';
+            } else {
+                icon.className = 'fa-regular fa-moon';
+            }
+        }
+    }
+
+    // Sayfa yüklendiğinde temayı uygula
+    initTheme();
+</script>
     
     @await RenderSectionAsync("Scripts", required: false)
 </body>
