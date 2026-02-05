@@ -264,6 +264,9 @@ namespace ProjectEmailNight.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("HangfireJobId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -271,6 +274,9 @@ namespace ProjectEmailNight.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsScheduled")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsStarred")
@@ -283,8 +289,10 @@ namespace ProjectEmailNight.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ReceiverId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("ScheduleSent")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("ScheduledAt")
                         .HasColumnType("datetime2");
@@ -497,8 +505,7 @@ namespace ProjectEmailNight.Migrations
                     b.HasOne("ProjectEmailNight.Entities.AppUser", "Receiver")
                         .WithMany("ReceivedEmails")
                         .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("ProjectEmailNight.Entities.AppUser", "Sender")
                         .WithMany("SentEmails")

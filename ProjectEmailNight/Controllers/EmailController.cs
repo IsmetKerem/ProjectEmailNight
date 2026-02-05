@@ -35,6 +35,8 @@ public class EmailController : Controller
         ViewBag.TotalInbox = await _context.Emails.CountAsync(e => e.ReceiverId == userId && !e.IsDeleted && !e.ReceiverDeleted && !e.IsDraft);
         ViewBag.TrashCount = await _context.Emails.CountAsync(e => 
             ((e.ReceiverId == userId && e.ReceiverDeleted) || (e.SenderId == userId && e.SenderDeleted)) && !e.IsDeleted);
+        ViewBag.ScheduledCount = await _context.Emails.CountAsync(e => 
+            e.SenderId == userId && e.IsScheduled && !e.ScheduleSent && !e.IsDeleted);
     }
 
     // GET: /Email/Inbox
@@ -497,50 +499,63 @@ public class EmailController : Controller
     }
 
     // POST: /Email/Compose
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Compose(ComposeViewModel model, List<IFormFile>? attachments)
+    // POST: /Email/Compose
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Compose(ComposeViewModel model, List<IFormFile>? attachments)
+{
+    var user = await _userManager.GetUserAsync(User);
+    if (user == null) return RedirectToAction("Login", "Account");
+
+    await SetCommonViewBagAsync(user.Id);
+
+    // Taslak kaydetme
+    if (model.IsDraft)
     {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null) return RedirectToAction("Login", "Account");
-
-        await SetCommonViewBagAsync(user.Id);
-
-        if (model.IsDraft)
-        {
-            try
-            {
-                await _emailService.SaveDraftAsync(user.Id, model.ReceiverEmail, model.Subject, model.Body, model.Id);
-                TempData["Success"] = "Taslak kaydedildi";
-                return RedirectToAction("Drafts");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", ex.Message);
-                ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
-                return View(model);
-            }
-        }
-
-        if (string.IsNullOrEmpty(model.ReceiverEmail))
-        {
-            ModelState.AddModelError(nameof(model.ReceiverEmail), "Alıcı gereklidir");
-            ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
-            return View(model);
-        }
-
-        if (string.IsNullOrEmpty(model.Subject))
-        {
-            ModelState.AddModelError(nameof(model.Subject), "Konu gereklidir");
-            ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
-            return View(model);
-        }
-
         try
         {
-            await _emailService.SendEmailAsync(user.Id, model.ReceiverEmail, model.Subject, model.Body, attachments);
-            TempData["Success"] = "E-posta başarıyla gönderildi";
-            return RedirectToAction("Sent");
+            await _emailService.SaveDraftAsync(user.Id, model.ReceiverEmail, model.Subject ?? "", model.Body ?? "", model.Id);
+            TempData["Success"] = "Taslak kaydedildi";
+            return RedirectToAction("Drafts");
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", ex.Message);
+            ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
+            return View(model);
+        }
+    }
+
+    // Validasyon
+    if (string.IsNullOrEmpty(model.ReceiverEmail))
+    {
+        ModelState.AddModelError(nameof(model.ReceiverEmail), "Alıcı gereklidir");
+        ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
+        return View(model);
+    }
+
+    if (string.IsNullOrEmpty(model.Subject))
+    {
+        ModelState.AddModelError(nameof(model.Subject), "Konu gereklidir");
+        ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
+        return View(model);
+    }
+
+    // Zamanlanmış gönderim
+    if (model.IsScheduled && model.ScheduledAt.HasValue)
+    {
+        try
+        {
+            var scheduledService = HttpContext.RequestServices.GetRequiredService<IScheduledEmailService>();
+            await scheduledService.ScheduleEmailAsync(
+                user.Id, 
+                model.ReceiverEmail, 
+                model.Subject, 
+                model.Body ?? "", 
+                model.ScheduledAt.Value
+            );
+            TempData["Success"] = $"E-posta {model.ScheduledAt.Value:dd MMM yyyy HH:mm} tarihinde gönderilmek üzere zamanlandı";
+            return RedirectToAction("Scheduled");
         }
         catch (ArgumentException ex)
         {
@@ -549,6 +564,21 @@ public class EmailController : Controller
             return View(model);
         }
     }
+
+    // Normal gönderim
+    try
+    {
+        await _emailService.SendEmailAsync(user.Id, model.ReceiverEmail, model.Subject, model.Body ?? "", attachments);
+        TempData["Success"] = "E-posta başarıyla gönderildi";
+        return RedirectToAction("Sent");
+    }
+    catch (ArgumentException ex)
+    {
+        ModelState.AddModelError(nameof(model.ReceiverEmail), ex.Message);
+        ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
+        return View(model);
+    }
+}
 
     // GET: /Email/Detail/5
     public async Task<IActionResult> Detail(int id, string? from = null)
@@ -1016,5 +1046,46 @@ public class EmailController : Controller
         ViewBag.SearchQuery = q;
 
         return View("Inbox", viewModel);
+    }
+    // GET: /Email/Scheduled
+    public async Task<IActionResult> Scheduled()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) return RedirectToAction("Login", "Account");
+
+        await SetCommonViewBagAsync(user.Id);
+
+        var scheduledEmails = await _context.Emails
+            .Include(e => e.Receiver)
+            .Where(e => e.SenderId == user.Id && e.IsScheduled && !e.ScheduleSent && !e.IsDeleted)
+            .OrderBy(e => e.ScheduledAt)
+            .Select(e => new ScheduledEmailViewModel
+            {
+                Id = e.Id,
+                ReceiverName = e.Receiver != null ? e.Receiver.Name + " " + e.Receiver.Surname : "",
+                ReceiverEmail = e.Receiver != null ? e.Receiver.Email : "",
+                Subject = e.Subject,
+                ScheduledAt = e.ScheduledAt ?? DateTime.UtcNow,
+                CreatedAt = e.CreatedAt
+            })
+            .ToListAsync();
+
+        ViewData["Title"] = "Zamanlanmış";
+        ViewData["PageTitle"] = "Zamanlanmış E-postalar";
+
+        return View(scheduledEmails);
+    }
+
+// POST: /Email/CancelScheduled
+    [HttpPost]
+    public async Task<IActionResult> CancelScheduled(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) return Json(new { success = false });
+
+        var scheduledService = HttpContext.RequestServices.GetRequiredService<IScheduledEmailService>();
+        var result = await scheduledService.CancelScheduledEmailAsync(id, user.Id);
+
+        return Json(new { success = result });
     }
 }

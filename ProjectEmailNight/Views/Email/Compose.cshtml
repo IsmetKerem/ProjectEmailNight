@@ -9,6 +9,8 @@
         <form asp-action="Compose" asp-controller="Email" method="post" id="compose-form" enctype="multipart/form-data">
             <input type="hidden" asp-for="ReplyToId" />
             <input type="hidden" asp-for="Body" id="body-hidden" />
+            <input type="hidden" asp-for="IsScheduled" id="is-scheduled" />
+            <input type="hidden" asp-for="ScheduledAt" id="scheduled-at" />
             
             @if(Model?.ReplyToId != null)
             {
@@ -59,12 +61,52 @@
                 <div class="compose__attachments-list" id="attachments-list"></div>
             </div>
 
+            <!-- Zamanlanmış Gönderim Paneli -->
+            <div class="compose__schedule-panel" id="schedule-panel" style="display: none;">
+                <div class="schedule-panel__header">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>Zamanlanmış Gönderim</span>
+                    <button type="button" class="schedule-panel__close" onclick="cancelSchedule()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="schedule-panel__content">
+                    <div class="schedule-panel__row">
+                        <label>Tarih</label>
+                        <input type="date" id="schedule-date" class="compose__input" />
+                    </div>
+                    <div class="schedule-panel__row">
+                        <label>Saat</label>
+                        <input type="time" id="schedule-time" class="compose__input" />
+                    </div>
+                    <div class="schedule-panel__quick-options">
+                        <button type="button" class="schedule-quick-btn" onclick="setQuickSchedule('tomorrow-morning')">
+                            <i class="fa-solid fa-sun"></i>
+                            <span>Yarın Sabah (09:00)</span>
+                        </button>
+                        <button type="button" class="schedule-quick-btn" onclick="setQuickSchedule('tomorrow-afternoon')">
+                            <i class="fa-solid fa-cloud-sun"></i>
+                            <span>Yarın Öğleden Sonra (14:00)</span>
+                        </button>
+                        <button type="button" class="schedule-quick-btn" onclick="setQuickSchedule('next-monday')">
+                            <i class="fa-solid fa-calendar-week"></i>
+                            <span>Gelecek Pazartesi (09:00)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div class="compose__footer">
                 <div class="compose__actions">
-                    <button type="submit" name="IsDraft" value="false" class="btn btn--primary">
-                        <i class="fa-solid fa-paper-plane"></i>
-                        <span>Gönder</span>
-                    </button>
+                    <div class="compose__send-group">
+                        <button type="submit" name="IsDraft" value="false" class="btn btn--primary" id="send-btn">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span id="send-btn-text">Gönder</span>
+                        </button>
+                        <button type="button" class="btn btn--primary compose__send-dropdown" onclick="toggleSchedulePanel()">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+                    </div>
                     
                     <div class="compose__toolbar-buttons">
                         <button type="button" class="compose__toolbar-btn" onclick="document.getElementById('file-input').click()" title="Dosya ekle">
@@ -104,6 +146,7 @@
             <div class="compose__chips">
                 <span class="compose__chip"><i class="fa-solid fa-bolt"></i> Anında iletim</span>
                 <span class="compose__chip"><i class="fa-solid fa-eye"></i> Okundu bildirimi</span>
+                <span class="compose__chip"><i class="fa-regular fa-clock"></i> Zamanlanmış gönderim</span>
             </div>
         </article>
 
@@ -129,6 +172,20 @@
                 </div>
             </div>
         </article>
+
+        <!-- Zamanlanmış E-postalar Link -->
+        <a asp-action="Scheduled" class="card card--soft" style="text-decoration: none; display: block; transition: all 0.2s;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(124, 58, 237, 0.15); display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-regular fa-clock" style="color: #a78bfa;"></i>
+                </div>
+                <div>
+                    <p style="margin: 0; font-weight: 500;">Zamanlanmış E-postalar</p>
+                    <p class="u-text-muted" style="margin: 0; font-size: 0.8rem;">Bekleyen gönderimlerinizi görün</p>
+                </div>
+                <i class="fa-solid fa-chevron-right u-text-muted" style="margin-left: auto;"></i>
+            </div>
+        </a>
     </aside>
 </section>
 
@@ -151,7 +208,7 @@
         }
         
         #quill-editor {
-            height: 350px;
+            height: 300px;
             background: transparent;
             color: #f9fafb;
         }
@@ -198,6 +255,22 @@
             display: flex;
             align-items: center;
             gap: 1rem;
+        }
+        
+        .compose__send-group {
+            display: flex;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .compose__send-group .btn--primary {
+            border-radius: 0.5rem 0 0 0.5rem;
+        }
+        
+        .compose__send-dropdown {
+            border-radius: 0 0.5rem 0.5rem 0 !important;
+            padding: 0.6rem 0.5rem !important;
+            border-left: 1px solid rgba(255,255,255,0.2) !important;
         }
         
         .compose__toolbar-buttons, .compose__meta-buttons {
@@ -262,6 +335,102 @@
             border-radius: 0.2rem;
             font-size: 0.7rem;
         }
+        
+        /* Zamanlanmış Gönderim Panel */
+        .compose__schedule-panel {
+            border-bottom: 1px solid #1f2937;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(59, 130, 246, 0.05));
+        }
+        
+        .schedule-panel__header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid #1f2937;
+            font-weight: 500;
+            color: #a78bfa;
+        }
+        
+        .schedule-panel__close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+        
+        .schedule-panel__close:hover {
+            color: #f9fafb;
+        }
+        
+        .schedule-panel__content {
+            padding: 1rem 1.25rem;
+        }
+        
+        .schedule-panel__row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .schedule-panel__row label {
+            width: 60px;
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+        
+        .schedule-panel__row input {
+            flex: 1;
+            max-width: 200px;
+        }
+        
+        .schedule-panel__quick-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #1f2937;
+        }
+        
+        .schedule-quick-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            color: #d1d5db;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .schedule-quick-btn:hover {
+            background: #374151;
+            border-color: #a78bfa;
+            color: #f9fafb;
+        }
+        
+        .schedule-quick-btn i {
+            color: #a78bfa;
+        }
+        
+        /* Scheduled indicator */
+        .compose__scheduled-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(124, 58, 237, 0.15);
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            color: #a78bfa;
+        }
     </style>
 }
 
@@ -282,12 +451,121 @@
             }
         });
         
+        var isScheduled = false;
+        var scheduledDateTime = null;
+        
         // Form submit
         document.getElementById('compose-form').addEventListener('submit', function(e) {
             var html = quill.root.innerHTML;
             if (html === '<p><br></p>') html = '';
             document.getElementById('body-hidden').value = html;
+            document.getElementById('is-scheduled').value = isScheduled;
+            if (scheduledDateTime) {
+                document.getElementById('scheduled-at').value = scheduledDateTime.toISOString();
+            }
         });
+        
+        // Zamanlanmış gönderim panel toggle
+        function toggleSchedulePanel() {
+            var panel = document.getElementById('schedule-panel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                setDefaultScheduleTime();
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+        
+        // Varsayılan zamanı ayarla (1 saat sonra)
+        function setDefaultScheduleTime() {
+            var now = new Date();
+            now.setHours(now.getHours() + 1);
+            now.setMinutes(0);
+            
+            var dateInput = document.getElementById('schedule-date');
+            var timeInput = document.getElementById('schedule-time');
+            
+            dateInput.value = now.toISOString().split('T')[0];
+            timeInput.value = now.toTimeString().slice(0,5);
+            
+            dateInput.min = new Date().toISOString().split('T')[0];
+        }
+        
+        // Hızlı zamanlama seçenekleri
+        function setQuickSchedule(option) {
+            var now = new Date();
+            var scheduled = new Date();
+            
+            switch(option) {
+                case 'tomorrow-morning':
+                    scheduled.setDate(now.getDate() + 1);
+                    scheduled.setHours(9, 0, 0, 0);
+                    break;
+                case 'tomorrow-afternoon':
+                    scheduled.setDate(now.getDate() + 1);
+                    scheduled.setHours(14, 0, 0, 0);
+                    break;
+                case 'next-monday':
+                    var daysUntilMonday = (8 - now.getDay()) % 7 || 7;
+                    scheduled.setDate(now.getDate() + daysUntilMonday);
+                    scheduled.setHours(9, 0, 0, 0);
+                    break;
+            }
+            
+            document.getElementById('schedule-date').value = scheduled.toISOString().split('T')[0];
+            document.getElementById('schedule-time').value = scheduled.toTimeString().slice(0,5);
+            
+            applySchedule();
+        }
+        
+        // Zamanlamayı uygula
+        function applySchedule() {
+            var dateInput = document.getElementById('schedule-date');
+            var timeInput = document.getElementById('schedule-time');
+            
+            if (!dateInput.value || !timeInput.value) {
+                alert('Lütfen tarih ve saat seçin');
+                return;
+            }
+            
+            scheduledDateTime = new Date(dateInput.value + 'T' + timeInput.value);
+            
+            if (scheduledDateTime <= new Date()) {
+                alert('Geçmiş bir tarih seçemezsiniz');
+                return;
+            }
+            
+            isScheduled = true;
+            
+            // Butonu güncelle
+            var sendBtn = document.getElementById('send-btn');
+            var sendBtnText = document.getElementById('send-btn-text');
+            sendBtn.innerHTML = '<i class="fa-regular fa-clock"></i> <span>' + formatScheduledTime(scheduledDateTime) + '</span>';
+            
+            // Paneli kapat
+            document.getElementById('schedule-panel').style.display = 'none';
+        }
+        
+        // Zamanlamayı iptal et
+        function cancelSchedule() {
+            isScheduled = false;
+            scheduledDateTime = null;
+            
+            var sendBtn = document.getElementById('send-btn');
+            sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>Gönder</span>';
+            
+            document.getElementById('schedule-panel').style.display = 'none';
+        }
+        
+        // Tarih formatla
+        function formatScheduledTime(date) {
+            var options = { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' };
+            return date.toLocaleDateString('tr-TR', options);
+        }
+        
+        // Tarih/saat değiştiğinde uygula
+        document.getElementById('schedule-date')?.addEventListener('change', applySchedule);
+        document.getElementById('schedule-time')?.addEventListener('change', applySchedule);
         
         // Dosya ekleme
         var attachedFiles = [];
@@ -341,14 +619,12 @@
                 document.querySelector('button[value="false"]').click();
             }
         });
-        // Mevcut script'lerin sonuna ekle:
-
+        
         // AI yanıtı varsa editöre ekle
         document.addEventListener('DOMContentLoaded', function() {
             var aiReply = sessionStorage.getItem('aiReply');
             if (aiReply) {
                 sessionStorage.removeItem('aiReply');
-                // Quill editöre ekle (mevcut içeriğin başına)
                 var currentContent = quill.root.innerHTML;
                 if (currentContent === '<p><br></p>') {
                     quill.root.innerHTML = '<p>' + aiReply.replace(/\n/g, '</p><p>') + '</p>';
@@ -356,6 +632,6 @@
                     quill.root.innerHTML = '<p>' + aiReply.replace(/\n/g, '</p><p>') + '</p>' + currentContent;
                 }
             }
-});
+        });
     </script>
 }

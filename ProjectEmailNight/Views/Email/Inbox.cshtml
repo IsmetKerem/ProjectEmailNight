@@ -69,6 +69,21 @@
                     </a>
                 </li>
                 <li class="inbox-sidebar__item">
+                    <a asp-controller="Email" asp-action="Scheduled" 
+                       class="inbox-sidebar__link @(Model.CurrentFolder == "scheduled" ? "inbox-sidebar__link--active" : "")">
+                        <span class="inbox-sidebar__link-left">
+                            <span class="inbox-sidebar__link-icon">
+                                <i class="fa-regular fa-clock"></i>
+                            </span>
+                            <span>Zamanlanmış</span>
+                        </span>
+                        @if(ViewBag.ScheduledCount != null && ViewBag.ScheduledCount > 0)
+                        {
+                            <span class="inbox-sidebar__badge">@ViewBag.ScheduledCount</span>
+                        }
+                    </a>
+                </li>
+                <li class="inbox-sidebar__item">
                     <a asp-controller="Email" asp-action="Trash" 
                        class="inbox-sidebar__link @(Model.CurrentFolder == "trash" ? "inbox-sidebar__link--active" : "")">
                         <span class="inbox-sidebar__link-left">

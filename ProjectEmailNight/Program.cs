@@ -1,3 +1,6 @@
+using Hangfire;
+using Hangfire.Dashboard;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProjectEmailNight.Context;
@@ -7,28 +10,23 @@ using ProjectEmailNight.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<IAIService, GeminiAIService>();
-
 // DbContext
 builder.Services.AddDbContext<EmailContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Identity
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
-    {
-        options.Password.RequireDigit = true;
-        options.Password.RequireLowercase = true;
-        options.Password.RequireUppercase = true;
-        options.Password.RequiredLength = 6;
-        options.Password.RequireNonAlphanumeric = false;
-        options.User.RequireUniqueEmail = true;
-        options.SignIn.RequireConfirmedEmail = false;
-    })
-    .AddEntityFrameworkStores<EmailContext>()
-    .AddDefaultTokenProviders();
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.User.RequireUniqueEmail = true;
+    options.SignIn.RequireConfirmedEmail = false;
+})
+.AddEntityFrameworkStores<EmailContext>()
+.AddDefaultTokenProviders();
 
 // Cookie ayarları
 builder.Services.ConfigureApplicationCookie(options =>
@@ -39,13 +37,36 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.ExpireTimeSpan = TimeSpan.FromDays(30);
     options.SlidingExpiration = true;
 });
-builder.Services.AddSignalR();
-builder.Services.AddScoped<INotificationService, NotificationService>();
 
+// Hangfire
+builder.Services.AddHangfire(config => config
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions
+    {
+        CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+        SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+        QueuePollInterval = TimeSpan.Zero,
+        UseRecommendedIsolationLevel = true,
+        DisableGlobalLocks = true
+    }));
+
+builder.Services.AddHangfireServer();
+
+// Services
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IAIService, GeminiAIService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IScheduledEmailService, ScheduledEmailService>();
+
+// SignalR
+builder.Services.AddSignalR();
+
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -57,13 +78,20 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication();  // Bu satırı ekle - UseAuthorization'dan ÖNCE olmalı!
+app.UseAuthentication();
 app.UseAuthorization();
+
+// Hangfire Dashboard (sadece Admin görebilir)
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new HangfireAuthorizationFilter() }
+});
+
 app.MapHub<NotificationHub>("/notificationHub");
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
 
 // Rolleri ve Admin kullanıcıyı oluştur
 using (var scope = app.Services.CreateScope())
@@ -71,7 +99,6 @@ using (var scope = app.Services.CreateScope())
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
 
-    // Rolleri oluştur
     string[] roles = { "Admin", "User" };
     foreach (var role in roles)
     {
@@ -81,7 +108,6 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    // Admin kullanıcı oluştur (yoksa)
     var adminEmail = "admin@emailnight.com";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     
@@ -107,4 +133,13 @@ using (var scope = app.Services.CreateScope())
 
 app.Run();
 
-app.Run();
+// Hangfire Authorization Filter
+public class HangfireAuthorizationFilter : IDashboardAuthorizationFilter
+{
+    public bool Authorize(DashboardContext context)
+    {
+        var httpContext = context.GetHttpContext();
+        return httpContext.User.Identity?.IsAuthenticated == true && 
+               httpContext.User.IsInRole("Admin");
+    }
+}

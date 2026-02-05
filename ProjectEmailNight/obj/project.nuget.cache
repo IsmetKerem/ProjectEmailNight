@@ -1,12 +1,17 @@
 {
   "version": 2,
-  "dgSpecHash": "k9717D4RIRs=",
+  "dgSpecHash": "WmQ6Y//KKA0=",
   "success": true,
   "projectFilePath": "/Users/ismetkerem/RiderProjects/ProjectEmailNight/ProjectEmailNight/ProjectEmailNight.csproj",
   "expectedPackageFiles": [
     "/Users/ismetkerem/.nuget/packages/azure.core/1.38.0/azure.core.1.38.0.nupkg.sha512",
     "/Users/ismetkerem/.nuget/packages/azure.identity/1.11.4/azure.identity.1.11.4.nupkg.sha512",
     "/Users/ismetkerem/.nuget/packages/bouncycastle.cryptography/2.6.1/bouncycastle.cryptography.2.6.1.nupkg.sha512",
+    "/Users/ismetkerem/.nuget/packages/hangfire/1.8.23/hangfire.1.8.23.nupkg.sha512",
+    "/Users/ismetkerem/.nuget/packages/hangfire.aspnetcore/1.8.23/hangfire.aspnetcore.1.8.23.nupkg.sha512",
+    "/Users/ismetkerem/.nuget/packages/hangfire.core/1.8.23/hangfire.core.1.8.23.nupkg.sha512",
+    "/Users/ismetkerem/.nuget/packages/hangfire.netcore/1.8.23/hangfire.netcore.1.8.23.nupkg.sha512",
+    "/Users/ismetkerem/.nuget/packages/hangfire.sqlserver/1.8.23/hangfire.sqlserver.1.8.23.nupkg.sha512",
     "/Users/ismetkerem/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/Users/ismetkerem/.nuget/packages/json.more.net/2.1.1/json.more.net.2.1.1.nupkg.sha512",
     "/Users/ismetkerem/.nuget/packages/jsonpointer.net/5.3.1/jsonpointer.net.5.3.1.nupkg.sha512",

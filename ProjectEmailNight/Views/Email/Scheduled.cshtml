@@ -1,0 +1,233 @@
+@model List<ProjectEmailNight.Models.ScheduledEmailViewModel>
+@{
+    ViewData["Title"] = "Zamanlanmış";
+    ViewData["PageTitle"] = "Zamanlanmış E-postalar";
+}
+
+<section class="scheduled-page">
+    <div class="card">
+        <header class="card__header" style="border-bottom: 1px solid #1f2937; padding-bottom: 1rem;">
+            <div>
+                <p class="card__title" style="font-size: 1.1rem;">
+                    <i class="fa-regular fa-clock" style="margin-right: 0.5rem; color: #a78bfa;"></i>
+                    Zamanlanmış E-postalar
+                </p>
+                <p class="u-text-muted" style="margin-top: 0.25rem; font-size: 0.85rem;">
+                    Bu e-postalar belirlenen zamanda otomatik olarak gönderilecek
+                </p>
+            </div>
+            <a asp-action="Compose" class="btn btn--primary btn--sm">
+                <i class="fa-solid fa-plus"></i>
+                <span>Yeni E-posta</span>
+            </a>
+        </header>
+
+        @if(Model.Any())
+        {
+            <div class="scheduled-list">
+                @foreach(var email in Model)
+                {
+                    <div class="scheduled-item" data-id="@email.Id">
+                        <div class="scheduled-item__icon">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                        <div class="scheduled-item__content">
+                            <div class="scheduled-item__header">
+                                <strong>@email.ReceiverName</strong>
+                                <span class="u-text-muted">&lt;@email.ReceiverEmail&gt;</span>
+                            </div>
+                            <div class="scheduled-item__subject">@email.Subject</div>
+                            <div class="scheduled-item__meta">
+                                <span class="scheduled-item__time">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                    @email.TimeUntilSend
+                                </span>
+                                <span class="u-text-muted">•</span>
+                                <span class="u-text-muted">
+                                    @email.ScheduledAt.ToString("dd MMM yyyy, HH:mm")
+                                </span>
+                            </div>
+                        </div>
+                        <div class="scheduled-item__actions">
+                            <button type="button" class="btn btn--secondary btn--sm" onclick="cancelScheduledEmail(@email.Id)" title="İptal Et">
+                                <i class="fa-solid fa-xmark"></i>
+                                <span>İptal</span>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="scheduled-empty">
+                <div class="scheduled-empty__icon">
+                    <i class="fa-regular fa-clock"></i>
+                </div>
+                <h3>Zamanlanmış e-posta yok</h3>
+                <p class="u-text-muted">E-posta yazarken "Sonra Gönder" seçeneğini kullanarak e-postalarınızı zamanlayabilirsiniz.</p>
+                <a asp-action="Compose" class="btn btn--primary" style="margin-top: 1rem;">
+                    <i class="fa-solid fa-pen"></i>
+                    <span>E-posta Yaz</span>
+                </a>
+            </div>
+        }
+    </div>
+
+    <a asp-action="Inbox" class="btn btn--secondary" style="margin-top: 1rem;">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Gelen Kutusuna Dön</span>
+    </a>
+</section>
+
+@section Styles {
+<style>
+    .scheduled-page {
+        max-width: 800px;
+    }
+    
+    .scheduled-list {
+        padding: 0.5rem 0;
+    }
+    
+    .scheduled-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #1f2937;
+        transition: background-color 0.15s;
+    }
+    
+    .scheduled-item:hover {
+        background-color: rgba(124, 58, 237, 0.05);
+    }
+    
+    .scheduled-item:last-child {
+        border-bottom: none;
+    }
+    
+    .scheduled-item__icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(59, 130, 246, 0.1));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #a78bfa;
+        flex-shrink: 0;
+    }
+    
+    .scheduled-item__content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .scheduled-item__header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .scheduled-item__subject {
+        margin-top: 0.25rem;
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .scheduled-item__meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .scheduled-item__time {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        color: #a78bfa;
+        font-weight: 500;
+    }
+    
+    .scheduled-item__actions {
+        flex-shrink: 0;
+    }
+    
+    .scheduled-empty {
+        text-align: center;
+        padding: 3rem 2rem;
+    }
+    
+    .scheduled-empty__icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(59, 130, 246, 0.1));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: #a78bfa;
+    }
+    
+    .scheduled-empty h3 {
+        margin: 0 0 0.5rem;
+        font-size: 1.1rem;
+    }
+    
+    .scheduled-empty p {
+        max-width: 400px;
+        margin: 0 auto;
+        font-size: 0.9rem;
+    }
+</style>
+}
+
+@section Scripts {
+<script>
+    async function cancelScheduledEmail(id) {
+        if (!confirm('Bu zamanlanmış e-postayı iptal etmek istediğinize emin misiniz?')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch('@Url.Action("CancelScheduled", "Email")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'id=' + id
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                // Satırı kaldır
+                const item = document.querySelector('[data-id="' + id + '"]');
+                if (item) {
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateX(-20px)';
+                    setTimeout(() => {
+                        item.remove();
+                        // Eğer liste boşsa sayfayı yenile
+                        if (document.querySelectorAll('.scheduled-item').length === 0) {
+                            location.reload();
+                        }
+                    }, 300);
+                }
+            } else {
+                alert('İptal işlemi başarısız oldu');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Bir hata oluştu');
+        }
+    }
+</script>
+}
