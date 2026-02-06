@@ -17,8 +17,8 @@ html {
 body {
   min-height: 100vh;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-    "Inter", "Segoe UI", sans-serif;
-  background-color: #0f172a;
+  "Inter", "Segoe UI", sans-serif;
+  background-color: #0a0a0f;
   color: #f9fafb;
   -webkit-font-smoothing: antialiased;
 }
@@ -79,8 +79,8 @@ button {
 }
 
 .u-badge--info {
-  background-color: rgba(59, 130, 246, 0.12);
-  color: #bfdbfe;
+  background-color: rgba(6, 182, 212, 0.12);
+  color: #a5f3fc;
 }
 
 /* ==========================================================================
@@ -91,9 +91,9 @@ button {
   min-height: 100vh;
   display: flex;
   align-items: stretch;
-  background: radial-gradient(circle at top left, #7c3aed 0, transparent 55%),
-    radial-gradient(circle at bottom right, #ec4899 0, transparent 55%),
-    #020617;
+  background: radial-gradient(circle at top left, #0891b2 0, transparent 55%),
+  radial-gradient(circle at bottom right, #06b6d4 0, transparent 55%),
+  #020617;
 }
 
 .auth-layout__panel {
@@ -107,12 +107,12 @@ button {
 .auth-layout__card {
   width: 100%;
   max-width: 420px;
-  background: radial-gradient(circle at top, rgba(124, 58, 237, 0.25), transparent 60%),
-    rgba(15, 23, 42, 0.9);
+  background: radial-gradient(circle at top, rgba(6, 182, 212, 0.25), transparent 60%),
+  rgba(10, 10, 15, 0.95);
   border-radius: 1.5rem;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  border: 1px solid rgba(148, 163, 184, 0.2);
   padding: 2.5rem 2.25rem;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.8);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(18px);
 }
 
@@ -130,7 +130,7 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  background: linear-gradient(135deg, #0891b2, #06b6d4);
   color: #f9fafb;
 }
 
@@ -184,13 +184,13 @@ button {
   width: 100%;
   padding: 0.7rem 0.9rem 0.7rem 2.4rem;
   border-radius: 0.75rem;
-  border: 1px solid #4b5563;
-  background-color: rgba(15, 23, 42, 0.85);
+  border: 1px solid #374151;
+  background-color: rgba(10, 10, 15, 0.9);
   color: #f9fafb;
   font-size: 0.9rem;
   outline: none;
   transition: border-color 0.18s ease, box-shadow 0.18s ease,
-    background-color 0.18s ease;
+  background-color 0.18s ease;
 }
 
 .auth-form__input::placeholder {
@@ -198,9 +198,9 @@ button {
 }
 
 .auth-form__input:focus {
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.4);
-  background-color: rgba(15, 23, 42, 0.95);
+  border-color: #06b6d4;
+  box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.4);
+  background-color: rgba(10, 10, 15, 0.95);
 }
 
 .auth-form__toggle {
@@ -232,15 +232,15 @@ button {
   width: 0.9rem;
   height: 0.9rem;
   border-radius: 0.25rem;
-  accent-color: #7c3aed;
+  accent-color: #06b6d4;
 }
 
 .auth-form__link {
-  color: #c4b5fd;
+  color: #67e8f9;
 }
 
 .auth-form__link:hover {
-  color: #e879f9;
+  color: #22d3ee;
 }
 
 .auth-form__actions {
@@ -259,7 +259,7 @@ button {
   font-weight: 500;
   cursor: pointer;
   transition: transform 0.16s ease, box-shadow 0.16s ease,
-    background-color 0.16s ease, color 0.16s ease;
+  background-color 0.16s ease, color 0.16s ease;
 }
 
 .btn:disabled {
@@ -269,19 +269,19 @@ button {
 
 .btn--primary {
   width: 100%;
-  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  background: linear-gradient(135deg, #0891b2, #06b6d4);
   color: #f9fafb;
-  box-shadow: 0 14px 35px rgba(124, 58, 237, 0.45);
+  box-shadow: 0 14px 35px rgba(6, 182, 212, 0.35);
 }
 
 .btn--primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 18px 45px rgba(124, 58, 237, 0.6);
+  box-shadow: 0 18px 45px rgba(6, 182, 212, 0.5);
 }
 
 .btn--primary:active {
   transform: translateY(0);
-  box-shadow: 0 10px 25px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 10px 25px rgba(6, 182, 212, 0.3);
 }
 
 .auth-layout__footer {
@@ -292,7 +292,7 @@ button {
 }
 
 .auth-layout__footer a {
-  color: #c4b5fd;
+  color: #67e8f9;
 }
 
 /* ==========================================================================
@@ -302,14 +302,14 @@ button {
 .layout {
   min-height: 100vh;
   display: flex;
-  background-color: #020617;
+  background-color: #0a0a0f;
 }
 
 .layout__sidebar {
   width: 260px;
-  background: radial-gradient(circle at top, rgba(124, 58, 237, 0.3), transparent 60%),
-    #020617;
-  border-right: 1px solid rgba(31, 41, 55, 0.9);
+  background: radial-gradient(circle at top, rgba(6, 182, 212, 0.2), transparent 60%),
+  #0a0a0f;
+  border-right: 1px solid rgba(31, 41, 55, 0.8);
   padding: 1.2rem 1.1rem;
   display: flex;
   flex-direction: column;
@@ -335,7 +335,7 @@ button {
   width: 34px;
   height: 34px;
   border-radius: 1rem;
-  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  background: linear-gradient(135deg, #0891b2, #06b6d4);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -405,17 +405,17 @@ button {
   font-size: 0.7rem;
   border-radius: 999px;
   padding: 0.1rem 0.45rem;
-  background-color: rgba(15, 23, 42, 0.9);
-  color: #9ca3af;
+  background-color: rgba(6, 182, 212, 0.2);
+  color: #67e8f9;
 }
 
 .sidebar__link:hover {
-  background-color: rgba(15, 23, 42, 0.9);
+  background-color: rgba(17, 24, 39, 0.9);
   color: #e5e7eb;
 }
 
 .sidebar__link--active {
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.24), rgba(236, 72, 153, 0.24));
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(8, 145, 178, 0.15));
   color: #f9fafb;
 }
 
@@ -432,8 +432,8 @@ button {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.13), transparent 55%),
-    #020617;
+  background: radial-gradient(circle at top right, rgba(6, 182, 212, 0.08), transparent 55%),
+  #0a0a0f;
 }
 
 .topbar {
@@ -441,7 +441,7 @@ button {
   align-items: center;
   justify-content: space-between;
   padding: 0.9rem 1.5rem;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+  border-bottom: 1px solid rgba(31, 41, 55, 0.8);
   backdrop-filter: blur(16px);
   position: sticky;
   top: 0;
@@ -478,7 +478,7 @@ button {
   padding: 0.55rem 0.8rem 0.55rem 2.1rem;
   border-radius: 999px;
   border: 1px solid #1e293b;
-  background-color: rgba(15, 23, 42, 0.95);
+  background-color: rgba(17, 24, 39, 0.95);
   color: #e5e7eb;
   font-size: 0.8rem;
   outline: none;
@@ -499,7 +499,7 @@ button {
   height: 32px;
   border-radius: 999px;
   border: 1px solid #1e293b;
-  background-color: rgba(15, 23, 42, 0.96);
+  background-color: rgba(17, 24, 39, 0.96);
   color: #9ca3af;
   display: inline-flex;
   align-items: center;
@@ -519,7 +519,7 @@ button {
   width: 7px;
   height: 7px;
   border-radius: 999px;
-  background: linear-gradient(to bottom right, #ec4899, #7c3aed);
+  background: linear-gradient(to bottom right, #06b6d4, #0891b2);
 }
 
 .topbar__profile {
@@ -528,7 +528,7 @@ button {
   gap: 0.55rem;
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
-  background-color: rgba(15, 23, 42, 0.96);
+  background-color: rgba(17, 24, 39, 0.96);
   border: 1px solid #1e293b;
   cursor: pointer;
 }
@@ -537,7 +537,7 @@ button {
   width: 28px;
   height: 28px;
   border-radius: 999px;
-  background: linear-gradient(to bottom right, #7c3aed, #ec4899);
+  background: linear-gradient(to bottom right, #0891b2, #06b6d4);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -576,17 +576,17 @@ button {
 }
 
 .card {
-  background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.22), transparent 65%),
-    rgba(15, 23, 42, 0.98);
+  background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.1), transparent 65%),
+  rgba(17, 24, 39, 0.95);
   border-radius: 1rem;
-  border: 1px solid rgba(30, 64, 175, 0.6);
+  border: 1px solid rgba(55, 65, 81, 0.5);
   padding: 1rem;
-  box-shadow: 0 18px 35px rgba(15, 23, 42, 0.8);
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.5);
 }
 
 .card--soft {
   border-color: rgba(31, 41, 55, 0.95);
-  background: rgba(15, 23, 42, 0.96);
+  background: rgba(17, 24, 39, 0.96);
 }
 
 .card__header {
@@ -667,10 +667,10 @@ button {
   width: 100%;
   justify-content: flex-start;
   border-radius: 999px;
-  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  background: linear-gradient(135deg, #0891b2, #06b6d4);
   color: #f9fafb;
   padding: 0.65rem 0.9rem;
-  box-shadow: 0 14px 30px rgba(124, 58, 237, 0.55);
+  box-shadow: 0 14px 30px rgba(6, 182, 212, 0.4);
 }
 
 .btn--compose i {
@@ -710,13 +710,13 @@ button {
 
 .inbox-sidebar__badge {
   font-size: 0.7rem;
-  background-color: rgba(15, 23, 42, 0.9);
+  background-color: rgba(17, 24, 39, 0.9);
   border-radius: 999px;
   padding: 0.05rem 0.45rem;
 }
 
 .inbox-sidebar__link--active {
-  background-color: rgba(15, 23, 42, 0.96);
+  background-color: rgba(17, 24, 39, 0.96);
   color: #e5e7eb;
 }
 
@@ -728,11 +728,11 @@ button {
 }
 
 .inbox-sidebar__label-dot--primary {
-  background-color: #7c3aed;
+  background-color: #06b6d4;
 }
 
 .inbox-sidebar__label-dot--secondary {
-  background-color: #ec4899;
+  background-color: #22d3ee;
 }
 
 .inbox-sidebar__label-dot--success {
@@ -750,7 +750,7 @@ button {
 .inbox-main {
   display: flex;
   flex-direction: column;
-  background-color: rgba(15, 23, 42, 0.96);
+  background-color: rgba(17, 24, 39, 0.96);
   border-radius: 1rem;
   border: 1px solid #1f2937;
 }
@@ -773,7 +773,7 @@ button {
 .inbox-main__checkbox {
   width: 0.95rem;
   height: 0.95rem;
-  accent-color: #7c3aed;
+  accent-color: #06b6d4;
 }
 
 .btn--ghost {
@@ -786,7 +786,7 @@ button {
 }
 
 .btn--ghost:hover {
-  background-color: #020617;
+  background-color: #111827;
   border-color: #1f2937;
 }
 
@@ -802,7 +802,7 @@ button {
 }
 
 .inbox-main__thead {
-  background-color: #020617;
+  background-color: #111827;
 }
 
 .inbox-main__thead th {
@@ -821,11 +821,11 @@ button {
 }
 
 .inbox-main__row:nth-child(even) {
-  background-color: rgba(15, 23, 42, 0.98);
+  background-color: rgba(17, 24, 39, 0.98);
 }
 
 .inbox-main__row:hover {
-  background-color: #020617;
+  background-color: #111827;
 }
 
 .inbox-main__cell {
@@ -846,13 +846,13 @@ button {
 }
 
 .inbox-main__category--primary {
-  background-color: rgba(124, 58, 237, 0.18);
-  color: #ddd6fe;
+  background-color: rgba(6, 182, 212, 0.18);
+  color: #a5f3fc;
 }
 
 .inbox-main__category--secondary {
-  background-color: rgba(236, 72, 153, 0.2);
-  color: #f9a8d4;
+  background-color: rgba(34, 211, 238, 0.2);
+  color: #67e8f9;
 }
 
 .inbox-main__category--success {
@@ -889,7 +889,7 @@ button {
 }
 
 .compose__form {
-  background-color: rgba(15, 23, 42, 0.96);
+  background-color: rgba(17, 24, 39, 0.96);
   border-radius: 1rem;
   border: 1px solid #1f2937;
   padding: 1rem;
@@ -916,7 +916,7 @@ button {
   padding: 0.55rem 0.75rem;
   border-radius: 0.65rem;
   border: 1px solid #1e293b;
-  background-color: rgba(15, 23, 42, 0.98);
+  background-color: rgba(17, 24, 39, 0.98);
   color: #e5e7eb;
   font-size: 0.85rem;
   outline: none;
@@ -946,13 +946,13 @@ button {
 }
 
 .btn--secondary {
-  background-color: #020617;
+  background-color: #111827;
   color: #e5e7eb;
   border: 1px solid #1f2937;
 }
 
 .btn--secondary:hover {
-  background-color: #020617;
+  background-color: #1f2937;
   border-color: #4b5563;
 }
 
@@ -983,7 +983,7 @@ button {
   font-size: 0.7rem;
   border-radius: 999px;
   padding: 0.2rem 0.55rem;
-  background-color: #020617;
+  background-color: #111827;
   border: 1px solid #1f2937;
 }
 
@@ -1027,7 +1027,7 @@ button {
   width: 32px;
   height: 32px;
   border-radius: 999px;
-  background: linear-gradient(to bottom right, #6366f1, #ec4899);
+  background: linear-gradient(to bottom right, #0891b2, #06b6d4);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1056,7 +1056,7 @@ button {
 .email-detail__attachment {
   padding: 0.55rem 0.6rem;
   border-radius: 0.7rem;
-  background-color: #020617;
+  background-color: #111827;
   border: 1px solid #1f2937;
   font-size: 0.8rem;
   display: flex;
@@ -1094,7 +1094,7 @@ button {
   width: 70px;
   height: 70px;
   border-radius: 999px;
-  background: conic-gradient(from 160deg, #7c3aed, #ec4899, #3b82f6, #7c3aed);
+  background: conic-gradient(from 160deg, #0891b2, #06b6d4, #22d3ee, #0891b2);
   padding: 2px;
 }
 
@@ -1102,7 +1102,7 @@ button {
   width: 100%;
   height: 100%;
   border-radius: inherit;
-  background-color: #020617;
+  background-color: #0a0a0f;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1208,7 +1208,7 @@ button {
 }
 
 .switch__input:checked + .switch__slider {
-  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  background: linear-gradient(135deg, #0891b2, #06b6d4);
 }
 
 .switch__input:checked + .switch__slider::before {
@@ -1217,136 +1217,22 @@ button {
 }
 
 /* ==========================================================================
-   Summernote Overrides (minimal, container only)
+   Okunmamış email satırı
    ========================================================================== */
 
-.note-editor {
-  border-radius: 0.75rem !important;
-  border-color: #1f2937 !important;
-  background-color: #020617 !important;
-}
-
-.note-toolbar {
-  background-color: #020617 !important;
-  border-bottom-color: #111827 !important;
-}
-
-.note-editable {
-  background-color: #020617 !important;
-  color: #e5e7eb !important;
-}
-
-/* ==========================================================================
-   Responsive
-   ========================================================================== */
-
-@media (max-width: 1024px) {
-  .layout__sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    transform: translateX(-100%);
-    transition: transform 0.2s ease-out;
-    z-index: 40;
-  }
-
-  .layout__sidebar--open {
-    transform: translateX(0);
-  }
-
-  .sidebar__toggle {
-    display: inline-flex;
-  }
-
-  .topbar {
-    padding-inline: 1rem;
-  }
-
-  .topbar__search {
-    display: none;
-  }
-
-  .dashboard-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .dashboard-charts {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .compose,
-  .email-detail,
-  .profile {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .inbox-layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
-  .content {
-    padding: 1rem;
-  }
-
-  .dashboard-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .dashboard-charts__row {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .auth-layout__panel {
-    padding: 1.5rem 1rem;
-  }
-
-  .auth-layout__card {
-    padding: 2rem 1.6rem;
-  }
-
-  .inbox-main__toolbar {
-    flex-wrap: wrap;
-    row-gap: 0.35rem;
-  }
-}
-
-/* Validation Errors */
-.auth-form__error {
-  color: #e74c3c;
-  font-size: 0.8rem;
-  margin-top: 0.25rem;
-  display: block;
-}
-
-.auth-form__error-box {
-  background: #fdeaea;
-  border: 1px solid #e74c3c;
-  color: #e74c3c;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  margin-bottom: 1rem;
-  font-size: 0.875rem;
-}
-
-.auth-form__error-box:empty {
-  display: none;
-}
-/* Okunmamış email satırı */
 .inbox-main__row--unread {
-  background-color: rgba(124, 58, 237, 0.08) !important;
+  background-color: rgba(6, 182, 212, 0.08) !important;
 }
 
 .inbox-main__row--unread:hover {
-  background-color: rgba(124, 58, 237, 0.15) !important;
+  background-color: rgba(6, 182, 212, 0.15) !important;
 }
+
 /* Arama input focus */
 .topbar__search-input:focus {
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
-  background-color: rgba(15, 23, 42, 1);
+  border-color: #06b6d4;
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+  background-color: rgba(17, 24, 39, 1);
 }
 
 .topbar__search form {
@@ -1354,16 +1240,15 @@ button {
   align-items: center;
   width: 100%;
 }
+
 /* ==========================================================================
    Email Detail Fixes
    ========================================================================== */
 
-/* Gönderen adı beyaz */
 .email-detail__sender-name {
   color: #f9fafb !important;
 }
 
-/* Quick actions tam genişlik */
 .email-detail__quick-actions {
   display: flex;
   flex-direction: column;
@@ -1375,25 +1260,22 @@ button {
   justify-content: center;
 }
 
-/* Buton içindeki span'lar görünsün */
 .btn span {
   display: inline;
 }
 
-/* Topbar profil ismi beyaz */
 .topbar__user-name {
   color: #f9fafb;
 }
 
-/* Card title beyaz */
 .card__title {
   color: #e5e7eb;
 }
 
-/* Timeline item text */
 .email-detail__timeline-item span:first-child {
   color: #e5e7eb;
 }
+
 /* ==========================================================================
    Toast Notifications
    ========================================================================== */
@@ -1414,7 +1296,7 @@ button {
   align-items: flex-start;
   gap: 0.75rem;
   padding: 1rem;
-  background: rgba(15, 23, 42, 0.98);
+  background: rgba(17, 24, 39, 0.98);
   border: 1px solid #1f2937;
   border-radius: 0.75rem;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
@@ -1428,7 +1310,7 @@ button {
 }
 
 .toast--email {
-  border-left: 3px solid #7c3aed;
+  border-left: 3px solid #06b6d4;
 }
 
 .toast--success {
@@ -1454,8 +1336,8 @@ button {
 }
 
 .toast--email .toast__icon {
-  background: rgba(124, 58, 237, 0.2);
-  color: #a78bfa;
+  background: rgba(6, 182, 212, 0.2);
+  color: #22d3ee;
 }
 
 .toast--success .toast__icon {
@@ -1523,7 +1405,7 @@ button {
   top: calc(100% + 0.5rem);
   right: 0;
   width: 360px;
-  background: rgba(15, 23, 42, 0.98);
+  background: rgba(17, 24, 39, 0.98);
   border: 1px solid #1f2937;
   border-radius: 0.75rem;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
@@ -1554,7 +1436,7 @@ button {
 .notification-dropdown__clear {
   background: none;
   border: none;
-  color: #7c3aed;
+  color: #06b6d4;
   font-size: 0.75rem;
   cursor: pointer;
 }
@@ -1595,7 +1477,7 @@ button {
 }
 
 .notification-dropdown__item:hover {
-  background: rgba(124, 58, 237, 0.1);
+  background: rgba(6, 182, 212, 0.1);
 }
 
 .notification-dropdown__item:last-child {
@@ -1606,7 +1488,7 @@ button {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  background: linear-gradient(135deg, #0891b2, #06b6d4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1647,6 +1529,7 @@ button {
   flex-shrink: 0;
   align-self: flex-start;
 }
+
 /* ==========================================================================
    Light Theme
    ========================================================================== */
@@ -1669,7 +1552,7 @@ button {
 
 [data-theme="light"] .layout__sidebar,
 [data-theme="light"] .sidebar {
-  background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+  background: linear-gradient(180deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%);
   border-right-color: transparent;
 }
 
@@ -1785,15 +1668,15 @@ button {
 }
 
 [data-theme="light"] .inbox-main__row:hover {
-  background-color: #ede9fe;
+  background-color: #e0f7fa;
 }
 
 [data-theme="light"] .inbox-main__row--unread {
-  background-color: #f5f3ff !important;
+  background-color: #e0f7fa !important;
 }
 
 [data-theme="light"] .inbox-main__row--unread:hover {
-  background-color: #ede9fe !important;
+  background-color: #b2ebf2 !important;
 }
 
 [data-theme="light"] .inbox-sidebar__link {
@@ -1884,8 +1767,8 @@ button {
 }
 
 [data-theme="light"] .ai-summary-box {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.08));
-  border-color: rgba(99, 102, 241, 0.3);
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(8, 145, 178, 0.08));
+  border-color: rgba(6, 182, 212, 0.3);
 }
 
 [data-theme="light"] .ai-summary-text {
@@ -1952,7 +1835,7 @@ button {
 
 /* Auth sayfaları için */
 [data-theme="light"] .auth-layout {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%);
 }
 
 [data-theme="light"] .auth-layout__card {
@@ -1981,4 +1864,106 @@ body {
 
 .card, .topbar, .inbox-main, .sidebar {
   transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ==========================================================================
+   Validation Errors
+   ========================================================================== */
+
+.auth-form__error {
+  color: #e74c3c;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.auth-form__error-box {
+  background: #fdeaea;
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.auth-form__error-box:empty {
+  display: none;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .layout__sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease-out;
+    z-index: 40;
+  }
+
+  .layout__sidebar--open {
+    transform: translateX(0);
+  }
+
+  .sidebar__toggle {
+    display: inline-flex;
+  }
+
+  .topbar {
+    padding-inline: 1rem;
+  }
+
+  .topbar__search {
+    display: none;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-charts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .compose,
+  .email-detail,
+  .profile {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .inbox-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .content {
+    padding: 1rem;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dashboard-charts__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .auth-layout__panel {
+    padding: 1.5rem 1rem;
+  }
+
+  .auth-layout__card {
+    padding: 2rem 1.6rem;
+  }
+
+  .inbox-main__toolbar {
+    flex-wrap: wrap;
+    row-gap: 0.35rem;
+  }
 }

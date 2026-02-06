@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectEmailNight.Context;
+using ProjectEmailNight.Dtos;
 using ProjectEmailNight.Entities;
 using ProjectEmailNight.Models;
 using ProjectEmailNight.Services;
@@ -16,13 +17,20 @@ public class EmailController : Controller
     private readonly UserManager<AppUser> _userManager;
     private readonly IEmailService _emailService;
     private readonly IWebHostEnvironment _environment;
+    private readonly ISmtpEmailService _smtpEmailService; // YENİ
 
-    public EmailController(EmailContext context, UserManager<AppUser> userManager, IEmailService emailService, IWebHostEnvironment environment)
+    public EmailController(
+        EmailContext context, 
+        UserManager<AppUser> userManager, 
+        IEmailService emailService, 
+        IWebHostEnvironment environment,
+        ISmtpEmailService smtpEmailService) // YENİ
     {
         _context = context;
         _userManager = userManager;
         _emailService = emailService;
         _environment = environment;
+        _smtpEmailService = smtpEmailService; // YENİ
     }
 
     private async Task SetCommonViewBagAsync(string userId)
@@ -109,7 +117,7 @@ public class EmailController : Controller
             .Include(e => e.Receiver)
             .Include(e => e.Category)
             .Include(e => e.Attachments)
-            .Where(e => e.SenderId == user.Id && !e.IsDeleted && !e.SenderDeleted && !e.IsDraft)
+            .Where(e => e.SenderId == user.Id && !e.IsDeleted && !e.SenderDeleted && !e.IsDraft && !e.IsScheduled)
             .OrderByDescending(e => e.CreatedAt);
 
         var totalCount = await query.CountAsync();
@@ -378,10 +386,13 @@ public class EmailController : Controller
         {
             foreach (var att in email.Attachments)
             {
-                var filePath = Path.Combine(_environment.WebRootPath, att.FilePath.TrimStart('/'));
-                if (System.IO.File.Exists(filePath))
+                if (!string.IsNullOrEmpty(att.FilePath))
                 {
-                    System.IO.File.Delete(filePath);
+                    var filePath = Path.Combine(_environment.WebRootPath, att.FilePath.TrimStart('/'));
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
                 }
             }
             _context.EmailAttachments.RemoveRange(email.Attachments);
@@ -413,10 +424,13 @@ public class EmailController : Controller
             {
                 foreach (var att in email.Attachments)
                 {
-                    var filePath = Path.Combine(_environment.WebRootPath, att.FilePath.TrimStart('/'));
-                    if (System.IO.File.Exists(filePath))
+                    if (!string.IsNullOrEmpty(att.FilePath))
                     {
-                        System.IO.File.Delete(filePath);
+                        var filePath = Path.Combine(_environment.WebRootPath, att.FilePath.TrimStart('/'));
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
                     }
                 }
                 _context.EmailAttachments.RemoveRange(email.Attachments);
@@ -498,87 +512,184 @@ public class EmailController : Controller
         return View(viewModel);
     }
 
-    // POST: /Email/Compose
-    // POST: /Email/Compose
-[HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> Compose(ComposeViewModel model, List<IFormFile>? attachments)
-{
-    var user = await _userManager.GetUserAsync(User);
-    if (user == null) return RedirectToAction("Login", "Account");
-
-    await SetCommonViewBagAsync(user.Id);
-
-    // Taslak kaydetme
-    if (model.IsDraft)
+    // POST: /Email/Compose - SMTP EKLENDİ
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Compose(ComposeViewModel model, List<IFormFile>? attachments)
     {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) return RedirectToAction("Login", "Account");
+
+        await SetCommonViewBagAsync(user.Id);
+
+        // Taslak kaydetme
+        if (model.IsDraft)
+        {
+            try
+            {
+                await _emailService.SaveDraftAsync(user.Id, model.ReceiverEmail, model.Subject ?? "", model.Body ?? "", model.Id);
+                TempData["Success"] = "Taslak kaydedildi";
+                return RedirectToAction("Drafts");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
+                return View(model);
+            }
+        }
+
+        // Validasyon
+        if (string.IsNullOrEmpty(model.ReceiverEmail))
+        {
+            ModelState.AddModelError(nameof(model.ReceiverEmail), "Alıcı gereklidir");
+            ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
+            return View(model);
+        }
+
+        if (string.IsNullOrEmpty(model.Subject))
+        {
+            ModelState.AddModelError(nameof(model.Subject), "Konu gereklidir");
+            ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
+            return View(model);
+        }
+
+        // Zamanlanmış gönderim
+        if (model.IsScheduled && model.ScheduledAt.HasValue)
+        {
+            try
+            {
+                var scheduledService = HttpContext.RequestServices.GetRequiredService<IScheduledEmailService>();
+                await scheduledService.ScheduleEmailAsync(
+                    user.Id, 
+                    model.ReceiverEmail, 
+                    model.Subject, 
+                    model.Body ?? "", 
+                    model.ScheduledAt.Value
+                );
+                TempData["Success"] = $"E-posta {model.ScheduledAt.Value:dd MMM yyyy HH:mm} tarihinde gönderilmek üzere zamanlandı";
+                return RedirectToAction("Scheduled");
+            }
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError(nameof(model.ReceiverEmail), ex.Message);
+                ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
+                return View(model);
+            }
+        }
+
+        // Normal gönderim
         try
         {
-            await _emailService.SaveDraftAsync(user.Id, model.ReceiverEmail, model.Subject ?? "", model.Body ?? "", model.Id);
-            TempData["Success"] = "Taslak kaydedildi";
-            return RedirectToAction("Drafts");
+            // 1. Alıcıyı bul veya oluştur
+            var receiver = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.ReceiverEmail);
+            if (receiver == null)
+            {
+                // Harici kullanıcı oluştur
+                receiver = new AppUser
+                {
+                    UserName = model.ReceiverEmail,
+                    NormalizedUserName = model.ReceiverEmail.ToUpper(),
+                    Email = model.ReceiverEmail,
+                    NormalizedEmail = model.ReceiverEmail.ToUpper(),
+                    Name = model.ReceiverEmail.Split('@')[0],
+                    Surname = "",
+                    EmailConfirmed = true,
+                    IsExternalUser = true,
+                    CreatedAt = DateTime.UtcNow,
+                    SecurityStamp = Guid.NewGuid().ToString()
+                };
+                _context.Users.Add(receiver);
+                await _context.SaveChangesAsync();
+            }
+
+            // 2. Veritabanına kaydet
+            var email = new Email
+            {
+                SenderId = user.Id,
+                ReceiverId = receiver.Id,
+                Subject = model.Subject,
+                Body = model.Body ?? "",
+                CreatedAt = DateTime.UtcNow,
+                IsRead = false,
+                IsStarred = false,
+                IsDraft = false,
+                CategoryId = 1 // Birincil
+            };
+
+            // 3. Ekleri işle
+            var emailAttachments = new List<EmailAttachmentDto>();
+            if (attachments != null && attachments.Any())
+            {
+                var uploadsPath = Path.Combine(_environment.WebRootPath, "uploads", "attachments");
+                if (!Directory.Exists(uploadsPath))
+                    Directory.CreateDirectory(uploadsPath);
+
+                foreach (var file in attachments)
+                {
+                    if (file.Length > 0)
+                    {
+                        var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+                        var filePath = Path.Combine(uploadsPath, fileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        // Veritabanı için
+                        email.Attachments.Add(new EmailAttachment
+                        {
+                            FileName = file.FileName,
+                            ContentType = file.ContentType,
+                            FilePath = $"/uploads/attachments/{fileName}",
+                            FileSize = file.Length
+                        });
+
+                        // SMTP için
+                        using var memoryStream = new MemoryStream();
+                        await file.CopyToAsync(memoryStream);
+                        emailAttachments.Add(new EmailAttachmentDto
+                        {
+                            FileName = file.FileName,
+                            Content = memoryStream.ToArray(),
+                            ContentType = file.ContentType
+                        });
+                    }
+                }
+            }
+
+            _context.Emails.Add(email);
+            await _context.SaveChangesAsync();
+
+            // 4. GERÇEK EMAIL GÖNDER (SMTP)
+            var smtpResult = await _smtpEmailService.SendEmailAsync(new SendEmailDto
+            {
+                To = model.ReceiverEmail,
+                Subject = model.Subject,
+                Body = model.Body ?? "",
+                IsHtml = true,
+                Attachments = emailAttachments.Any() ? emailAttachments : null
+            });
+
+            if (smtpResult)
+            {
+                TempData["Success"] = "E-posta başarıyla gönderildi! ✉️";
+            }
+            else
+            {
+                TempData["Warning"] = "E-posta veritabanına kaydedildi ancak SMTP gönderimi başarısız oldu. Lütfen SMTP ayarlarınızı kontrol edin.";
+            }
+
+            return RedirectToAction("Sent");
         }
         catch (Exception ex)
         {
-            ModelState.AddModelError("", ex.Message);
+            ModelState.AddModelError("", $"Hata: {ex.Message}");
             ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
             return View(model);
         }
     }
-
-    // Validasyon
-    if (string.IsNullOrEmpty(model.ReceiverEmail))
-    {
-        ModelState.AddModelError(nameof(model.ReceiverEmail), "Alıcı gereklidir");
-        ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
-        return View(model);
-    }
-
-    if (string.IsNullOrEmpty(model.Subject))
-    {
-        ModelState.AddModelError(nameof(model.Subject), "Konu gereklidir");
-        ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
-        return View(model);
-    }
-
-    // Zamanlanmış gönderim
-    if (model.IsScheduled && model.ScheduledAt.HasValue)
-    {
-        try
-        {
-            var scheduledService = HttpContext.RequestServices.GetRequiredService<IScheduledEmailService>();
-            await scheduledService.ScheduleEmailAsync(
-                user.Id, 
-                model.ReceiverEmail, 
-                model.Subject, 
-                model.Body ?? "", 
-                model.ScheduledAt.Value
-            );
-            TempData["Success"] = $"E-posta {model.ScheduledAt.Value:dd MMM yyyy HH:mm} tarihinde gönderilmek üzere zamanlandı";
-            return RedirectToAction("Scheduled");
-        }
-        catch (ArgumentException ex)
-        {
-            ModelState.AddModelError(nameof(model.ReceiverEmail), ex.Message);
-            ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
-            return View(model);
-        }
-    }
-
-    // Normal gönderim
-    try
-    {
-        await _emailService.SendEmailAsync(user.Id, model.ReceiverEmail, model.Subject, model.Body ?? "", attachments);
-        TempData["Success"] = "E-posta başarıyla gönderildi";
-        return RedirectToAction("Sent");
-    }
-    catch (ArgumentException ex)
-    {
-        ModelState.AddModelError(nameof(model.ReceiverEmail), ex.Message);
-        ViewBag.Users = await GetUsersExceptCurrentAsync(user.Id);
-        return View(model);
-    }
-}
 
     // GET: /Email/Detail/5
     public async Task<IActionResult> Detail(int id, string? from = null)
@@ -634,6 +745,9 @@ public async Task<IActionResult> Compose(ComposeViewModel model, List<IFormFile>
 
         if (attachment.Email.SenderId != user.Id && attachment.Email.ReceiverId != user.Id)
             return Forbid();
+
+        if (string.IsNullOrEmpty(attachment.FilePath))
+            return NotFound();
 
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", attachment.FilePath.TrimStart('/'));
         
@@ -824,10 +938,13 @@ public async Task<IActionResult> Compose(ComposeViewModel model, List<IFormFile>
             {
                 foreach (var att in email.Attachments)
                 {
-                    var filePath = Path.Combine(_environment.WebRootPath, att.FilePath.TrimStart('/'));
-                    if (System.IO.File.Exists(filePath))
+                    if (!string.IsNullOrEmpty(att.FilePath))
                     {
-                        System.IO.File.Delete(filePath);
+                        var filePath = Path.Combine(_environment.WebRootPath, att.FilePath.TrimStart('/'));
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
                     }
                 }
                 _context.EmailAttachments.RemoveRange(email.Attachments);
@@ -1047,6 +1164,7 @@ public async Task<IActionResult> Compose(ComposeViewModel model, List<IFormFile>
 
         return View("Inbox", viewModel);
     }
+
     // GET: /Email/Scheduled
     public async Task<IActionResult> Scheduled()
     {
@@ -1076,7 +1194,7 @@ public async Task<IActionResult> Compose(ComposeViewModel model, List<IFormFile>
         return View(scheduledEmails);
     }
 
-// POST: /Email/CancelScheduled
+    // POST: /Email/CancelScheduled
     [HttpPost]
     public async Task<IActionResult> CancelScheduled(int id)
     {
@@ -1087,5 +1205,25 @@ public async Task<IActionResult> Compose(ComposeViewModel model, List<IFormFile>
         var result = await scheduledService.CancelScheduledEmailAsync(id, user.Id);
 
         return Json(new { success = result });
+    }
+
+    // POST: /Email/SyncEmails - Manuel senkronizasyon
+    [HttpPost]
+    public async Task<IActionResult> SyncEmails()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) return Json(new { success = false });
+
+        try
+        {
+            var imapService = HttpContext.RequestServices.GetRequiredService<IImapEmailService>();
+            var emails = await imapService.GetEmailsAsync(20);
+            
+            return Json(new { success = true, count = emails.Count, message = $"{emails.Count} email bulundu" });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
     }
 }

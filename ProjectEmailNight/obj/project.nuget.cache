@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "WmQ6Y//KKA0=",
+  "dgSpecHash": "4LXDGj5dHNQ=",
   "success": true,
   "projectFilePath": "/Users/ismetkerem/RiderProjects/ProjectEmailNight/ProjectEmailNight/ProjectEmailNight.csproj",
   "expectedPackageFiles": [
@@ -17,6 +17,7 @@
     "/Users/ismetkerem/.nuget/packages/jsonpointer.net/5.3.1/jsonpointer.net.5.3.1.nupkg.sha512",
     "/Users/ismetkerem/.nuget/packages/jsonschema.net/7.3.4/jsonschema.net.7.3.4.nupkg.sha512",
     "/Users/ismetkerem/.nuget/packages/jsonschema.net.generation/5.0.4/jsonschema.net.generation.5.0.4.nupkg.sha512",
+    "/Users/ismetkerem/.nuget/packages/mailkit/4.14.1/mailkit.4.14.1.nupkg.sha512",
     "/Users/ismetkerem/.nuget/packages/microsoft.aspnetcore.authentication/2.3.0/microsoft.aspnetcore.authentication.2.3.0.nupkg.sha512",
     "/Users/ismetkerem/.nuget/packages/microsoft.aspnetcore.authentication.abstractions/2.3.0/microsoft.aspnetcore.authentication.abstractions.2.3.0.nupkg.sha512",
     "/Users/ismetkerem/.nuget/packages/microsoft.aspnetcore.authentication.cookies/2.3.0/microsoft.aspnetcore.authentication.cookies.2.3.0.nupkg.sha512",

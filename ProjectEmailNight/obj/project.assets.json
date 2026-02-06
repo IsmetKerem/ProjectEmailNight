@@ -258,6 +258,23 @@
           }
         }
       },
+      "MailKit/4.14.1": {
+        "type": "package",
+        "dependencies": {
+          "MimeKit": "4.14.0",
+          "System.Formats.Asn1": "8.0.1"
+        },
+        "compile": {
+          "lib/net8.0/MailKit.dll": {
+            "related": ".dll.config;.pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/MailKit.dll": {
+            "related": ".dll.config;.pdb;.xml"
+          }
+        }
+      },
       "Microsoft.AspNetCore.Authentication/2.3.0": {
         "type": "package",
         "dependencies": {
@@ -2974,6 +2991,46 @@
         "lib/net9.0/JsonSchema.Net.Generation.xml",
         "lib/netstandard2.0/JsonSchema.Net.Generation.dll",
         "lib/netstandard2.0/JsonSchema.Net.Generation.xml"
+      ]
+    },
+    "MailKit/4.14.1": {
+      "sha512": "Rawu+h3lSSjKra0AxR+IUB99VQ7jWI+MvxThekqLhf+ic7VQ7a69lmPFW+LXuRYHla4ADcn3x16Gsvju3LTq9w==",
+      "type": "package",
+      "path": "mailkit/4.14.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "docs/ExchangeOAuth2.md",
+        "docs/FAQ.md",
+        "docs/GMailOAuth2.md",
+        "docs/README.md",
+        "icons/mailkit-50.png",
+        "lib/net462/MailKit.dll",
+        "lib/net462/MailKit.dll.config",
+        "lib/net462/MailKit.pdb",
+        "lib/net462/MailKit.xml",
+        "lib/net47/MailKit.dll",
+        "lib/net47/MailKit.dll.config",
+        "lib/net47/MailKit.pdb",
+        "lib/net47/MailKit.xml",
+        "lib/net48/MailKit.dll",
+        "lib/net48/MailKit.dll.config",
+        "lib/net48/MailKit.pdb",
+        "lib/net48/MailKit.xml",
+        "lib/net8.0/MailKit.dll",
+        "lib/net8.0/MailKit.dll.config",
+        "lib/net8.0/MailKit.pdb",
+        "lib/net8.0/MailKit.xml",
+        "lib/netstandard2.0/MailKit.dll",
+        "lib/netstandard2.0/MailKit.dll.config",
+        "lib/netstandard2.0/MailKit.pdb",
+        "lib/netstandard2.0/MailKit.xml",
+        "lib/netstandard2.1/MailKit.dll",
+        "lib/netstandard2.1/MailKit.dll.config",
+        "lib/netstandard2.1/MailKit.pdb",
+        "lib/netstandard2.1/MailKit.xml",
+        "mailkit.4.14.1.nupkg.sha512",
+        "mailkit.nuspec"
       ]
     },
     "Microsoft.AspNetCore.Authentication/2.3.0": {
@@ -6501,6 +6558,7 @@
     "net8.0": [
       "Hangfire >= 1.8.23",
       "Hangfire.SqlServer >= 1.8.23",
+      "MailKit >= 4.14.1",
       "Microsoft.AspNetCore.Identity >= 2.3.9",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 8.0.23",
       "Microsoft.AspNetCore.SignalR >= 1.2.9",
@@ -6561,6 +6619,10 @@
           "Hangfire.SqlServer": {
             "target": "Package",
             "version": "[1.8.23, )"
+          },
+          "MailKit": {
+            "target": "Package",
+            "version": "[4.14.1, )"
           },
           "Microsoft.AspNetCore.Identity": {
             "target": "Package",

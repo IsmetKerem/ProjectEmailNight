@@ -35,4 +35,6 @@ public class Email
     public virtual EmailCategory? Category { get; set; }
     
     public virtual ICollection<EmailAttachment> Attachments { get; set; } = new List<EmailAttachment>();
+    
+    public string? ExternalMessageId { get; set; }
 }

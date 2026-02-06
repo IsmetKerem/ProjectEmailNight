@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectEmailNight.Context;
 using ProjectEmailNight.Entities;
 using ProjectEmailNight.Hubs;
+using ProjectEmailNight.Models;
 using ProjectEmailNight.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,7 +60,11 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAIService, GeminiAIService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IScheduledEmailService, ScheduledEmailService>();
-
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+builder.Services.Configure<ImapSettings>(builder.Configuration.GetSection("ImapSettings"));
+builder.Services.AddScoped<ISmtpEmailService, SmtpEmailService>();
+builder.Services.AddScoped<IImapEmailService, ImapEmailService>();
+builder.Services.AddHostedService<EmailSyncService>();
 // SignalR
 builder.Services.AddSignalR();
 

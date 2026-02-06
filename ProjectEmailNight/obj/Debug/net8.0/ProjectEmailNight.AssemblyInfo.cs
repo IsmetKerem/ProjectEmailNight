@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProjectEmailNight")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0c1a0abf4fd9972c27c3c710e93af30ac772d1f1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+640be17fb152da9938e314f37f88e41c0d73832d")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProjectEmailNight")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProjectEmailNight")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

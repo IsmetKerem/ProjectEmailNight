@@ -18,4 +18,6 @@ public class AppUser : IdentityUser
     public virtual ICollection<Email> SentEmails { get; set; } = new List<Email>();
     public virtual ICollection<Email> ReceivedEmails { get; set; } = new List<Email>();
     public virtual ICollection<EmailCategory> Categories { get; set; } = new List<EmailCategory>();
+    public bool IsExternalUser { get; set; } = false;
+    
 }

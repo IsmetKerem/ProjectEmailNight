@@ -1,124 +1,329 @@
 @model ProjectEmailNight.Models.DashboardViewModel
 @{
     ViewData["Title"] = "Kontrol Paneli";
-    ViewData["PageTitle"] = "Genel Görünüm";
+    ViewData["PageTitle"] = "Dashboard";
 }
 
 <!-- Özet Kartlar -->
 <section aria-label="Özet kartlar" class="dashboard-grid">
-    <article class="card">
+    <article class="card stat-card">
         <header class="card__header">
-            <div>
-                <p class="card__title">Gelen E-postalar</p>
-                <p class="card__value">@Model.ReceivedEmails</p>
+            <div class="stat-icon stat-icon--primary">
+                <i class="fa-solid fa-inbox"></i>
             </div>
             <span class="card__delta @(Model.ReceivedChangePercent >= 0 ? "u-text-success" : "u-text-danger")">
                 <i class="fa-solid @(Model.ReceivedChangePercent >= 0 ? "fa-arrow-trend-up" : "fa-arrow-trend-down")"></i>
                 <span>%@Math.Abs(Model.ReceivedChangePercent)</span>
             </span>
         </header>
-        <p class="card__meta">Son 7 gün / önceki haftaya göre</p>
+        <p class="card__value">@Model.ReceivedEmails.ToString("N0")</p>
+        <p class="card__title">Toplam Gelen</p>
     </article>
 
-    <article class="card">
+    <article class="card stat-card">
         <header class="card__header">
-            <div>
-                <p class="card__title">Gönderilen E-postalar</p>
-                <p class="card__value">@Model.SentEmails</p>
+            <div class="stat-icon stat-icon--blue">
+                <i class="fa-solid fa-paper-plane"></i>
             </div>
             <span class="card__delta @(Model.SentChangePercent >= 0 ? "u-text-success" : "u-text-danger")">
                 <i class="fa-solid @(Model.SentChangePercent >= 0 ? "fa-arrow-trend-up" : "fa-arrow-trend-down")"></i>
                 <span>%@Math.Abs(Model.SentChangePercent)</span>
             </span>
         </header>
-        <p class="card__meta">Son 7 gün / önceki haftaya göre</p>
+        <p class="card__value">@Model.SentEmails.ToString("N0")</p>
+        <p class="card__title">Gönderilen</p>
     </article>
 
-    <article class="card">
+    <article class="card stat-card">
         <header class="card__header">
-            <div>
-                <p class="card__title">Okunmamış</p>
-                <p class="card__value">@Model.UnreadEmails</p>
+            <div class="stat-icon stat-icon--purple">
+                <i class="fa-solid fa-envelope-open"></i>
             </div>
+            <span class="card__delta u-text-success">
+                <i class="fa-solid fa-check"></i>
+            </span>
         </header>
-        <p class="card__meta">Bekleyen e-postalar</p>
+        <p class="card__value">%@Model.ReadRate</p>
+        <p class="card__title">Okunma Oranı</p>
     </article>
 
-    <article class="card">
+    <article class="card stat-card">
         <header class="card__header">
-            <div>
-                <p class="card__title">Yıldızlı</p>
-                <p class="card__value">@Model.StarredEmails</p>
+            <div class="stat-icon stat-icon--orange">
+                <i class="fa-solid fa-reply"></i>
             </div>
+            <span class="card__delta u-text-success">
+                <i class="fa-solid fa-clock"></i>
+            </span>
         </header>
-        <p class="card__meta">İşaretli e-postalar</p>
+        <p class="card__value">@Model.AvgResponseTimeHours<span style="font-size: 1rem; color: #9ca3af;">h</span></p>
+        <p class="card__title">Ort. Yanıt Süresi</p>
     </article>
 </section>
 
-<!-- Grafikler -->
+<!-- Ana Grafikler -->
 <section class="dashboard-charts" aria-label="Grafikler">
+    <!-- Email Trafiği -->
     <article class="card">
         <header class="card__header">
-            <p class="card__title">Haftalık E-posta Trendi</p>
-            <span class="u-badge u-badge--info">Son 7 gün</span>
+            <div>
+                <p class="card__title" style="font-size: 1rem;">📈 Email Trafiği</p>
+                <p class="u-text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">Son 7 günlük gelen ve gönderilen</p>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #7c3aed;"></span>
+                    <span style="font-size: 0.75rem; color: #9ca3af;">Gelen</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #ec4899;"></span>
+                    <span style="font-size: 0.75rem; color: #9ca3af;">Gönderilen</span>
+                </div>
+            </div>
         </header>
-        <div class="card__chart">
-            <canvas id="chart-weekly" aria-label="Haftalık e-posta grafiği"></canvas>
+        <div class="card__chart" style="height: 280px;">
+            <canvas id="chart-traffic"></canvas>
         </div>
     </article>
 
+    <!-- Kategori Dağılımı -->
     <article class="card">
         <header class="card__header">
-            <p class="card__title">Kategori Dağılımı</p>
-            <span class="u-badge u-badge--success">Tüm zamanlar</span>
+            <div>
+                <p class="card__title" style="font-size: 1rem;">🏷️ Kategori Dağılımı</p>
+                <p class="u-text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">Email kategorileri analizi</p>
+            </div>
         </header>
-        <div class="card__chart">
-            <canvas id="chart-categories" aria-label="Kategori dağılımı grafiği"></canvas>
+        <div class="card__chart" style="height: 180px;">
+            <canvas id="chart-categories"></canvas>
         </div>
-        <div style="margin-top: 1rem; font-size: 0.85rem;">
+        <div style="margin-top: 1rem;">
             @foreach(var cat in Model.CategoryStats)
             {
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem;">
-                    <span style="width: 12px; height: 12px; border-radius: 3px; background-color: @cat.Color;"></span>
-                    <span>@cat.Name</span>
-                    <span class="u-text-muted">%@cat.Percentage</span>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(31, 41, 55, 0.5);">
+                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <span style="width: 10px; height: 10px; border-radius: 3px; background-color: @cat.Color;"></span>
+                        <span style="font-size: 0.85rem;">@cat.Name</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <span class="u-text-muted" style="font-size: 0.8rem;">@cat.Count</span>
+                        <div style="width: 60px; height: 5px; background: rgba(31, 41, 55, 0.8); border-radius: 3px; overflow: hidden;">
+                            <div style="height: 100%; width: @cat.Percentage%; background: @cat.Color; border-radius: 3px;"></div>
+                        </div>
+                    </div>
                 </div>
             }
         </div>
     </article>
 </section>
 
-<!-- Son Gelen E-postalar -->
-<section aria-label="Son e-postalar">
+<!-- Aktivite Haritası ve AI Insights -->
+<section style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.1rem; margin-bottom: 1.5rem;">
+    <!-- Heatmap -->
     <article class="card">
         <header class="card__header">
-            <p class="card__title">Son Gelen E-postalar</p>
-            <a asp-controller="Email" asp-action="Inbox" style="color: #c4b5fd; font-size: 0.85rem;">
+            <div>
+                <p class="card__title" style="font-size: 1rem;">🔥 Aktivite Haritası</p>
+                <p class="u-text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">Saatlik email yoğunluğunuz</p>
+            </div>
+        </header>
+        <div id="heatmap-container" style="margin-top: 1rem; overflow-x: auto;"></div>
+    </article>
+
+    <!-- AI Insights -->
+    <article class="card" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(236, 72, 153, 0.1)); border-color: rgba(124, 58, 237, 0.3);">
+        <header class="card__header">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #7c3aed, #ec4899); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-robot" style="font-size: 1.1rem;"></i>
+                </div>
+                <div>
+                    <p class="card__title" style="font-size: 1rem;">🤖 AI Öngörüleri</p>
+                    <p class="u-text-muted" style="font-size: 0.7rem;">Gemini destekli analizler</p>
+                </div>
+            </div>
+        </header>
+        <div style="margin-top: 1rem;">
+            @foreach(var insight in Model.AiInsights)
+            {
+                <div style="background: rgba(0, 0, 0, 0.2); border-radius: 10px; padding: 0.85rem; margin-bottom: 0.6rem;">
+                    <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                        <span style="font-size: 1.1rem;">@insight.Icon</span>
+                        <div>
+                            <p style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">@insight.Title</p>
+                            <p style="font-size: 0.75rem; color: #9ca3af;">@insight.Description</p>
+                        </div>
+                    </div>
+                </div>
+            }
+            @if(!Model.AiInsights.Any())
+            {
+                <div style="text-align: center; padding: 1rem; color: #6b7280;">
+                    <i class="fa-solid fa-sparkles" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <p style="font-size: 0.8rem;">Henüz yeterli veri yok</p>
+                </div>
+            }
+        </div>
+    </article>
+</section>
+
+<!-- Haftalık Karşılaştırma ve Performans -->
+<section style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; margin-bottom: 1.5rem;">
+    <!-- Haftalık Karşılaştırma -->
+    <article class="card">
+        <header class="card__header">
+            <div>
+                <p class="card__title" style="font-size: 1rem;">📊 Haftalık Karşılaştırma</p>
+                <p class="u-text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">Bu hafta vs Geçen hafta</p>
+            </div>
+        </header>
+        <div class="card__chart" style="height: 220px;">
+            <canvas id="chart-weekly-compare"></canvas>
+        </div>
+    </article>
+
+    <!-- Performans Metrikleri -->
+    <article class="card">
+        <header class="card__header">
+            <div>
+                <p class="card__title" style="font-size: 1rem;">⏱️ Performans Metrikleri</p>
+                <p class="u-text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">Yanıt ve verimlilik</p>
+            </div>
+        </header>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;">
+            <div style="text-align: center; padding: 1rem; background: rgba(16, 185, 129, 0.1); border-radius: 12px;">
+                <p style="font-size: 2rem; font-weight: 700; color: #10b981; font-family: 'JetBrains Mono', monospace;">@Model.AvgResponseTimeHours<span style="font-size: 0.9rem;">h</span></p>
+                <p style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">Ort. Yanıt Süresi</p>
+            </div>
+            <div style="text-align: center; padding: 1rem; background: rgba(59, 130, 246, 0.1); border-radius: 12px;">
+                <p style="font-size: 2rem; font-weight: 700; color: #3b82f6; font-family: 'JetBrains Mono', monospace;">%@Model.ResponseRate</p>
+                <p style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">Yanıtlama Oranı</p>
+            </div>
+            <div style="text-align: center; padding: 1rem; background: rgba(139, 92, 246, 0.1); border-radius: 12px;">
+                <p style="font-size: 2rem; font-weight: 700; color: #8b5cf6; font-family: 'JetBrains Mono', monospace;">@Model.RepliedCount</p>
+                <p style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">Bu Hafta Yanıtlanan</p>
+            </div>
+        </div>
+        <div style="margin-top: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-size: 0.8rem;">Okunma Oranı</span>
+                <span style="font-size: 0.8rem; color: #10b981;">%@Model.ReadRate</span>
+            </div>
+            <div style="height: 8px; background: rgba(31, 41, 55, 0.8); border-radius: 4px; overflow: hidden;">
+                <div style="height: 100%; width: @Model.ReadRate%; background: linear-gradient(90deg, #10b981, #06d6a0); border-radius: 4px; transition: width 1s ease;"></div>
+            </div>
+        </div>
+        <div style="margin-top: 1rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-size: 0.8rem;">Yanıtlama Oranı</span>
+                <span style="font-size: 0.8rem; color: #3b82f6;">%@Model.ResponseRate</span>
+            </div>
+            <div style="height: 8px; background: rgba(31, 41, 55, 0.8); border-radius: 4px; overflow: hidden;">
+                <div style="height: 100%; width: @Model.ResponseRate%; background: linear-gradient(90deg, #3b82f6, #60a5fa); border-radius: 4px; transition: width 1s ease;"></div>
+            </div>
+        </div>
+    </article>
+</section>
+
+<!-- Alt Grid: Aktiviteler, Kişiler, Son Emailler -->
+<section style="display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 1.1rem;">
+    <!-- Son Aktiviteler -->
+    <article class="card">
+        <header class="card__header">
+            <div>
+                <p class="card__title" style="font-size: 1rem;">⚡ Son Aktiviteler</p>
+                <p class="u-text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">Gerçek zamanlı</p>
+            </div>
+        </header>
+        <div style="margin-top: 0.75rem;">
+            @foreach(var activity in Model.RecentActivities)
+            {
+                <a asp-controller="Email" asp-action="Detail" asp-route-id="@activity.EmailId" 
+                   style="display: flex; gap: 0.75rem; padding: 0.65rem 0; border-bottom: 1px solid rgba(31, 41, 55, 0.5); transition: background 0.2s;">
+                    <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, @activity.AvatarColor, #ec4899); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; flex-shrink: 0;">
+                        @activity.SenderInitials
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <p style="font-weight: 500; font-size: 0.85rem; margin-bottom: 0.15rem;">@activity.SenderName</p>
+                        <p class="u-text-muted" style="font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@activity.Description</p>
+                        <p style="font-size: 0.7rem; color: #4b5563; margin-top: 0.2rem;">@activity.TimeAgo</p>
+                    </div>
+                </a>
+            }
+            @if(!Model.RecentActivities.Any())
+            {
+                <div style="text-align: center; padding: 1.5rem; color: #6b7280;">
+                    <i class="fa-solid fa-bolt" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <p style="font-size: 0.8rem;">Henüz aktivite yok</p>
+                </div>
+            }
+        </div>
+    </article>
+
+    <!-- En Çok İletişim -->
+    <article class="card">
+        <header class="card__header">
+            <div>
+                <p class="card__title" style="font-size: 1rem;">👥 En Çok İletişim</p>
+                <p class="u-text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">Sık yazıştıklarınız</p>
+            </div>
+        </header>
+        <div style="margin-top: 0.75rem;">
+            @foreach(var contact in Model.TopContacts)
+            {
+                <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0; border-bottom: 1px solid rgba(31, 41, 55, 0.5);">
+                    <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, @contact.AvatarColor, #a78bfa); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 600; flex-shrink: 0;">
+                        @contact.Initials
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <p style="font-weight: 500; font-size: 0.85rem; margin-bottom: 0.1rem;">@contact.Name</p>
+                        <p class="u-text-muted" style="font-size: 0.7rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@contact.Email</p>
+                    </div>
+                    <div style="background: rgba(15, 23, 42, 0.8); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.75rem; color: #9ca3af; font-family: 'JetBrains Mono', monospace;">
+                        @contact.EmailCount
+                    </div>
+                </div>
+            }
+            @if(!Model.TopContacts.Any())
+            {
+                <div style="text-align: center; padding: 1.5rem; color: #6b7280;">
+                    <i class="fa-solid fa-users" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <p style="font-size: 0.8rem;">Henüz yeterli veri yok</p>
+                </div>
+            }
+        </div>
+    </article>
+
+    <!-- Son Gelen E-postalar -->
+    <article class="card">
+        <header class="card__header">
+            <p class="card__title" style="font-size: 1rem;">📧 Son Gelen E-postalar</p>
+            <a asp-controller="Email" asp-action="Inbox" style="color: #c4b5fd; font-size: 0.8rem;">
                 Tümünü Gör <i class="fa-solid fa-arrow-right"></i>
             </a>
         </header>
         
-        <div style="margin-top: 1rem;">
+        <div style="margin-top: 0.75rem;">
             @foreach(var email in Model.RecentEmails)
             {
                 <a asp-controller="Email" asp-action="Detail" asp-route-id="@email.Id" 
-                   style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.5rem; background: @(!email.IsRead ? "rgba(124, 58, 237, 0.1)" : "transparent"); transition: background 0.2s;">
-                    <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, @email.CategoryColor, #ec4899); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0;">
+                   style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem; border-radius: 0.6rem; margin-bottom: 0.4rem; background: @(!email.IsRead ? "rgba(124, 58, 237, 0.1)" : "transparent"); transition: background 0.2s;">
+                    <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, @email.CategoryColor, #ec4899); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0;">
                         @email.SenderInitials
                     </div>
                     <div style="flex: 1; min-width: 0;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
-                            <span style="font-weight: @(!email.IsRead ? "600" : "400");">@email.SenderName</span>
-                            <span class="u-text-muted" style="font-size: 0.75rem;">@email.CreatedAt.ToString("dd MMM HH:mm")</span>
+                            <span style="font-weight: @(!email.IsRead ? "600" : "400"); font-size: 0.85rem;">@email.SenderName</span>
+                            <span class="u-text-muted" style="font-size: 0.7rem;">@email.CreatedAt.ToString("dd MMM HH:mm")</span>
                         </div>
-                        <div style="font-weight: @(!email.IsRead ? "500" : "400"); margin-bottom: 0.2rem;">
+                        <div style="font-weight: @(!email.IsRead ? "500" : "400"); font-size: 0.85rem; margin-bottom: 0.2rem;">
                             @if(email.IsStarred)
                             {
-                                <i class="fa-solid fa-star" style="color: #facc15; margin-right: 0.3rem;"></i>
+                                <i class="fa-solid fa-star" style="color: #facc15; margin-right: 0.3rem; font-size: 0.75rem;"></i>
                             }
                             @email.Subject
                         </div>
-                        <div class="u-text-muted" style="font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <div class="u-text-muted" style="font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             @Html.Raw(System.Text.RegularExpressions.Regex.Replace(email.Preview, "<.*?>", ""))
                         </div>
                     </div>
@@ -136,56 +341,186 @@
     </article>
 </section>
 
+@section Styles {
+    <style>
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+        
+        .stat-card:nth-child(1)::before { background: #10b981; }
+        .stat-card:nth-child(2)::before { background: #3b82f6; }
+        .stat-card:nth-child(3)::before { background: #8b5cf6; }
+        .stat-card:nth-child(4)::before { background: #f59e0b; }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .stat-icon--primary { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        .stat-icon--blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+        .stat-icon--purple { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+        .stat-icon--orange { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        
+        .stat-card .card__value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0 0.25rem;
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+        }
+        
+        .stat-card .card__title {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        
+        /* Heatmap Styles */
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: 40px repeat(24, 1fr);
+            gap: 3px;
+            font-size: 0.65rem;
+        }
+        
+        .heatmap-day {
+            display: flex;
+            align-items: center;
+            color: #9ca3af;
+            font-size: 0.7rem;
+        }
+        
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .heatmap-cell:hover {
+            transform: scale(1.3);
+            z-index: 10;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+        }
+        
+        .heatmap-hour {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.6rem;
+        }
+        
+        /* Responsive */
+        @@media (max-width: 1200px) {
+            section[style*="grid-template-columns: 2fr 1fr"],
+            section[style*="grid-template-columns: 1fr 1fr"],
+            section[style*="grid-template-columns: 1fr 1fr 1.5fr"] {
+                grid-template-columns: 1fr !important;
+            }
+        }
+    </style>
+}
+
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Haftalık E-posta Grafiği
-            const weeklyCtx = document.getElementById('chart-weekly');
-            if (weeklyCtx) {
-                new Chart(weeklyCtx, {
-                    type: 'bar',
+            // Chart.js Varsayılan Ayarlar
+            Chart.defaults.color = '#9ca3af';
+            Chart.defaults.borderColor = 'rgba(31, 41, 55, 0.5)';
+
+            // Email Trafiği Grafiği (Line Chart)
+            const trafficCtx = document.getElementById('chart-traffic');
+            if (trafficCtx) {
+                const trafficGradient = trafficCtx.getContext('2d').createLinearGradient(0, 0, 0, 280);
+                trafficGradient.addColorStop(0, 'rgba(124, 58, 237, 0.3)');
+                trafficGradient.addColorStop(1, 'rgba(124, 58, 237, 0)');
+
+                const sentGradient = trafficCtx.getContext('2d').createLinearGradient(0, 0, 0, 280);
+                sentGradient.addColorStop(0, 'rgba(236, 72, 153, 0.3)');
+                sentGradient.addColorStop(1, 'rgba(236, 72, 153, 0)');
+
+                new Chart(trafficCtx, {
+                    type: 'line',
                     data: {
                         labels: [@Html.Raw(string.Join(",", Model.WeeklyEmailData.Select(d => $"'{d.Label}'")))],
-                        datasets: [
-                            {
-                                label: 'Gelen',
-                                data: [@string.Join(",", Model.WeeklyEmailData.Select(d => d.Value))],
-                                backgroundColor: 'rgba(124, 58, 237, 0.8)',
-                                borderRadius: 6
-                            },
-                            {
-                                label: 'Gönderilen',
-                                data: [@string.Join(",", Model.WeeklyEmailData.Select(d => d.SecondValue ?? 0))],
-                                backgroundColor: 'rgba(236, 72, 153, 0.8)',
-                                borderRadius: 6
-                            }
-                        ]
+                        datasets: [{
+                            label: 'Gelen',
+                            data: [@string.Join(",", Model.WeeklyEmailData.Select(d => d.Value))],
+                            borderColor: '#7c3aed',
+                            backgroundColor: trafficGradient,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#7c3aed',
+                            pointBorderColor: '#020617',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }, {
+                            label: 'Gönderilen',
+                            data: [@string.Join(",", Model.WeeklyEmailData.Select(d => d.SecondValue ?? 0))],
+                            borderColor: '#ec4899',
+                            backgroundColor: sentGradient,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#ec4899',
+                            pointBorderColor: '#020617',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: {
-                                position: 'top',
-                                labels: { color: '#9ca3af' }
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                                titleColor: '#f9fafb',
+                                bodyColor: '#9ca3af',
+                                borderColor: '#1f2937',
+                                borderWidth: 1,
+                                padding: 12,
+                                cornerRadius: 8
                             }
                         },
                         scales: {
                             y: {
                                 beginAtZero: true,
-                                ticks: { color: '#6b7280', stepSize: 1 },
-                                grid: { color: 'rgba(107, 114, 128, 0.2)' }
+                                grid: { color: 'rgba(31, 41, 55, 0.3)' },
+                                ticks: { color: '#6b7280' }
                             },
                             x: {
-                                ticks: { color: '#6b7280' },
-                                grid: { display: false }
+                                grid: { display: false },
+                                ticks: { color: '#6b7280' }
                             }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
                         }
                     }
                 });
             }
 
-            // Kategori Dağılımı Grafiği
+            // Kategori Dağılımı (Doughnut)
             const categoryCtx = document.getElementById('chart-categories');
             if (categoryCtx) {
                 new Chart(categoryCtx, {
@@ -195,18 +530,143 @@
                         datasets: [{
                             data: [@string.Join(",", Model.CategoryStats.Select(c => c.Count))],
                             backgroundColor: [@Html.Raw(string.Join(",", Model.CategoryStats.Select(c => $"'{c.Color}'")))],
-                            borderWidth: 0
+                            borderWidth: 0,
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+
+            // Haftalık Karşılaştırma (Bar Chart)
+            const weeklyCompareCtx = document.getElementById('chart-weekly-compare');
+            if (weeklyCompareCtx) {
+                new Chart(weeklyCompareCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: [@Html.Raw(string.Join(",", Model.WeeklyEmailData.Select(d => $"'{d.Label}'")))],
+                        datasets: [{
+                            label: 'Bu Hafta',
+                            data: [@string.Join(",", Model.WeeklyEmailData.Select(d => d.Value + (d.SecondValue ?? 0)))],
+                            backgroundColor: 'rgba(124, 58, 237, 0.8)',
+                            borderRadius: 6,
+                            borderSkipped: false
+                        }, {
+                            label: 'Geçen Hafta',
+                            data: [@string.Join(",", Model.LastWeekEmailData.Select(d => d.Value + (d.SecondValue ?? 0)))],
+                            backgroundColor: 'rgba(236, 72, 153, 0.6)',
+                            borderRadius: 6,
+                            borderSkipped: false
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { display: false }
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    pointStyle: 'circle',
+                                    padding: 15,
+                                    color: '#9ca3af'
+                                }
+                            }
                         },
-                        cutout: '70%'
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(31, 41, 55, 0.3)' },
+                                ticks: { color: '#6b7280' }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#6b7280' }
+                            }
+                        }
                     }
                 });
+            }
+
+            // Heatmap Oluştur
+            generateHeatmap();
+        });
+
+        function generateHeatmap() {
+            const container = document.getElementById('heatmap-container');
+            if (!container) return;
+
+            const heatmapData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.HeatmapData));
+            const days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+            
+            let html = '<div class="heatmap-grid">';
+            
+            // Saat başlıkları
+            html += '<div></div>';
+            for (let h = 0; h < 24; h++) {
+                if (h % 3 === 0) {
+                    html += `<div class="heatmap-hour">${h}:00</div>`;
+                } else {
+                    html += '<div class="heatmap-hour"></div>';
+                }
+            }
+            
+            // Günler ve hücreler
+            days.forEach(day => {
+                html += `<div class="heatmap-day">${day}</div>`;
+                for (let h = 0; h < 24; h++) {
+                    const data = heatmapData.find(d => d.Day === day && d.Hour === h);
+                    const intensity = data ? data.Intensity : 0;
+                    const count = data ? data.Count : 0;
+                    const color = getHeatmapColor(intensity);
+                    html += `<div class="heatmap-cell" style="background: ${color};" title="${day} ${h}:00 - ${count} email"></div>`;
+                }
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function getHeatmapColor(intensity) {
+            if (intensity < 0.1) return 'rgba(124, 58, 237, 0.05)';
+            if (intensity < 0.25) return 'rgba(124, 58, 237, 0.2)';
+            if (intensity < 0.5) return 'rgba(124, 58, 237, 0.4)';
+            if (intensity < 0.75) return 'rgba(124, 58, 237, 0.6)';
+            return 'rgba(124, 58, 237, 0.85)';
+        }
+
+        // Sayı animasyonu
+        function animateValue(element, start, end, duration, suffix = '') {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                element.textContent = value.toLocaleString('tr-TR') + suffix;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Stat kartlarını animasyonla göster
+        document.querySelectorAll('.stat-card .card__value').forEach((el, i) => {
+            const text = el.textContent;
+            const numMatch = text.match(/[\d.,]+/);
+            if (numMatch) {
+                const num = parseFloat(numMatch[0].replace(',', '.'));
+                const suffix = text.replace(numMatch[0], '');
+                setTimeout(() => {
+                    animateValue(el, 0, num, 1200, suffix);
+                }, i * 150);
             }
         });
     </script>

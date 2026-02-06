@@ -183,6 +183,9 @@ namespace ProjectEmailNight.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsExternalUser")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsOnline")
                         .HasColumnType("bit");
 
@@ -263,6 +266,9 @@ namespace ProjectEmailNight.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("ExternalMessageId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HangfireJobId")
                         .HasColumnType("nvarchar(max)");

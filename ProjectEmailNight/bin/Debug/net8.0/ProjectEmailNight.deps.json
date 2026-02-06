@@ -10,6 +10,7 @@
         "dependencies": {
           "Hangfire": "1.8.23",
           "Hangfire.SqlServer": "1.8.23",
+          "MailKit": "4.14.1",
           "Microsoft.AspNetCore.Identity": "2.3.9",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "8.0.23",
           "Microsoft.AspNetCore.SignalR": "1.2.9",
@@ -213,6 +214,18 @@
           "lib/net8.0/JsonSchema.Net.Generation.dll": {
             "assemblyVersion": "5.0.0.0",
             "fileVersion": "5.0.4.0"
+          }
+        }
+      },
+      "MailKit/4.14.1": {
+        "dependencies": {
+          "MimeKit": "4.14.0",
+          "System.Formats.Asn1": "8.0.2"
+        },
+        "runtime": {
+          "lib/net8.0/MailKit.dll": {
+            "assemblyVersion": "4.14.0.0",
+            "fileVersion": "4.14.1.0"
           }
         }
       },
@@ -1659,6 +1672,13 @@
       "sha512": "sha512-VNcQd95tHbpWRvKjRfWOjFXHRPKH+zMBEmrgQCavsDZYI3+zMjCyKXTtOScI2dMbYllgYbVu9aH7JHgluE1lpA==",
       "path": "jsonschema.net.generation/5.0.4",
       "hashPath": "jsonschema.net.generation.5.0.4.nupkg.sha512"
+    },
+    "MailKit/4.14.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Rawu+h3lSSjKra0AxR+IUB99VQ7jWI+MvxThekqLhf+ic7VQ7a69lmPFW+LXuRYHla4ADcn3x16Gsvju3LTq9w==",
+      "path": "mailkit/4.14.1",
+      "hashPath": "mailkit.4.14.1.nupkg.sha512"
     },
     "Microsoft.AspNetCore.Authentication/2.3.0": {
       "type": "package",

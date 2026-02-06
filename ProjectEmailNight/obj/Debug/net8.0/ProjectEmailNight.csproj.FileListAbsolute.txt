@@ -193,3 +193,4 @@
 /Users/ismetkerem/RiderProjects/ProjectEmailNight/ProjectEmailNight/bin/Debug/net8.0/tr-TR/Hangfire.Core.resources.dll
 /Users/ismetkerem/RiderProjects/ProjectEmailNight/ProjectEmailNight/bin/Debug/net8.0/zh-TW/Hangfire.Core.resources.dll
 /Users/ismetkerem/RiderProjects/ProjectEmailNight/ProjectEmailNight/bin/Debug/net8.0/zh/Hangfire.Core.resources.dll
+/Users/ismetkerem/RiderProjects/ProjectEmailNight/ProjectEmailNight/bin/Debug/net8.0/MailKit.dll
